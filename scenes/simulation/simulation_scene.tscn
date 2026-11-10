@@ -1,0 +1,285 @@
+[gd_scene load_steps=5 format=3 uid="uid://f6m7s8k9l0m1n"]
+
+[ext_resource type="Script" path="res://scripts/ui/simulation_scene.gd" id="1_sim"]
+[ext_resource type="Script" path="res://scripts/simulation/simulation_engine.gd" id="2_eng"]
+[ext_resource type="Script" path="res://scripts/visuals/planet_visualizer.gd" id="3_pla"]
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 1
+background_color = Color(0.015, 0.02, 0.035, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.2, 0.25, 0.35, 1)
+
+[node name="SimulationScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_sim")
+
+[node name="SimulationEngine" type="Node" parent="."]
+script = ExtResource("2_eng")
+
+[node name="ViewportContainer" type="SubViewportContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="ViewportContainer"]
+handle_input_locally = false
+size = Vector2i(1280, 720)
+render_target_update_mode = 4
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="ViewportContainer/SubViewport"]
+environment = SubResource("Environment_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="ViewportContainer/SubViewport"]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 6, 7, 8)
+light_color = Color(1, 0.98, 0.95, 1)
+light_energy = 1.7
+
+[node name="PlanetNode" type="Node3D" parent="ViewportContainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.8, -4.5)
+script = ExtResource("3_pla")
+planet_type = "Earth"
+radius = 3.5
+rotate_speed = 0.03
+
+[node name="CraftPivot" type="Node3D" parent="ViewportContainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="SpacecraftVisual" type="Node3D" parent="ViewportContainer/SubViewport/CraftPivot"]
+
+[node name="Camera3D" type="Camera3D" parent="ViewportContainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 1.2, 3.8)
+current = true
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PanelTop" type="PanelContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 20.0
+offset_top = 16.0
+offset_right = -20.0
+offset_bottom = 66.0
+grow_horizontal = 2
+
+[node name="HBox" type="HBoxContainer" parent="UI/PanelTop"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="LblMissionName" type="Label" parent="UI/PanelTop/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+text = "FLIGHT TELEMETRY // TERRAPULSE-1"
+
+[node name="VSeparator1" type="VSeparator" parent="UI/PanelTop/HBox"]
+layout_mode = 2
+
+[node name="LblPhase" type="Label" parent="UI/PanelTop/HBox"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "PHASE 1: LAUNCH & ASCENT"
+
+[node name="BarProgress" type="ProgressBar" parent="UI/PanelTop/HBox"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+show_percentage = false
+
+[node name="PanelTelemetry" type="PanelContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.12
+anchor_bottom = 0.86
+offset_left = 20.0
+offset_right = 310.0
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="UI/PanelTelemetry"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="UI/PanelTelemetry/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "LIVE TELEMETRY STREAM"
+
+[node name="HSeparator" type="HSeparator" parent="UI/PanelTelemetry/VBox"]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="UI/PanelTelemetry/VBox"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 10
+
+[node name="LblTime" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 12
+text = "Mission Elapsed:"
+
+[node name="ValTime" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "Day 0.0"
+
+[node name="LblAlt" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 12
+text = "Altitude:"
+
+[node name="ValAlt" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "0.0 km"
+
+[node name="LblVel" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 12
+text = "Orbital Velocity:"
+
+[node name="ValVel" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "0.00 km/s"
+
+[node name="LblBat" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 12
+text = "Power Bus Reserve:"
+
+[node name="ValBat" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 12
+text = "100%"
+
+[node name="LblSig" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 12
+text = "DSN Signal Margin:"
+
+[node name="ValSig" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "+24.0 dB"
+
+[node name="LblData" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 12
+text = "Downlinked Data:"
+
+[node name="ValData" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 12
+text = "0 / 0 MB"
+
+[node name="PanelEvents" type="PanelContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.64
+anchor_top = 0.12
+anchor_right = 0.985
+anchor_bottom = 0.86
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="UI/PanelEvents"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="UI/PanelEvents/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "MISSION CONTROL EVENT LOG"
+
+[node name="HSeparator" type="HSeparator" parent="UI/PanelEvents/VBox"]
+layout_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="UI/PanelEvents/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ListEvents" type="VBoxContainer" parent="UI/PanelEvents/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="PanelControls" type="PanelContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -60.0
+offset_right = -20.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="HBox" type="HBoxContainer" parent="UI/PanelControls"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BtnPause" type="Button" parent="UI/PanelControls/HBox"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "PAUSE"
+
+[node name="Btn1x" type="Button" parent="UI/PanelControls/HBox"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "1X"
+
+[node name="Btn2x" type="Button" parent="UI/PanelControls/HBox"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "2X"
+
+[node name="Btn4x" type="Button" parent="UI/PanelControls/HBox"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "4X"
+
+[node name="Spacer" type="Control" parent="UI/PanelControls/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BtnSkip" type="Button" parent="UI/PanelControls/HBox"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "SKIP TO REPORT ➔"

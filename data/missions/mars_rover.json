@@ -1,0 +1,44 @@
+{
+  "mission_id": "mars_rover",
+  "mission_name": "Ares Pathfinder",
+  "subtitle": "Jezero Crater Astrobiology Laboratory",
+  "destination": "Mars",
+  "difficulty": "Complex",
+  "budget_limit": 650.0,
+  "mass_limit": 2400.0,
+  "power_requirement": 320.0,
+  "communication_requirement": 40.0,
+  "duration_days": 687.0,
+  "scientific_target": 150.0,
+  "min_delta_v": 2200.0,
+  "required_components": [
+    "chassis_mars_rover",
+    "land_mars_entry",
+    "land_skycrane",
+    "inst_mars_drill",
+    "comm_high_gain_dish",
+    "data_rad_computer"
+  ],
+  "recommended_components": [
+    "power_rtg",
+    "prop_biprop",
+    "inst_mastcam_stereo",
+    "data_solid_state_recorder"
+  ],
+  "brief_overview": "Deliver a 6-wheeled robotic astrobiology rover to Jezero Crater, Mars. Survive hypersonic atmospheric entry (EDL) and deposit sample cache tubes exploring ancient lakebed clays for signs of biosignatures.",
+  "objectives": [
+    "Survive interplanetary cruise, trajectory correction maneuvers, and entry into Mars atmosphere.",
+    "Execute guided Entry, Descent, and Landing (EDL) sequence using supersonic parachute and rocket sky crane.",
+    "Deploy 6-wheel rover mobility and traverse 15+ km across ancient Jezero delta deposits.",
+    "Drill and hermetically seal rock core samples searching for organic molecular biosignatures.",
+    "Transmit compressed science and high-definition panorama telemetry via Deep Space Network."
+  ],
+  "engineering_constraints": [
+    "The 'Seven Minutes of Terror': One-way radio light travel time from Mars to Earth is 4 to 20 minutes, meaning the entire atmospheric entry and landing sequence must be 100% autonomous.",
+    "Solar Distance & Dust: Mars receives less than 43% of Earth's solar irradiance. Dust accumulation on solar arrays drastically degrades power, making nuclear RTG systems preferable.",
+    "Mass & Budget Limits: An interplanetary rover stack (aeroshell, parachute, sky crane, rover) requires strict mass control to fit within launch vehicle fairings."
+  ],
+  "educational_context": "Jezero Crater was chosen for NASA's Mars 2020 mission because it hosted an ancient lake and river delta over 3.5 billion years ago. Clay minerals deposited in the delta preserve microscopic organic structures and biomarkers if microbial life ever arose on Mars.",
+  "nasa_reference_title": "NASA Mars 2020 Perseverance Rover Mission",
+  "nasa_reference_url": "https://mars.nasa.gov/mars2020/"
+}

@@ -1,0 +1,244 @@
+[gd_scene load_steps=5 format=3 uid="uid://b2m3s4k5l6m7n"]
+
+[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
+[ext_resource type="Script" path="res://scripts/visuals/planet_visualizer.gd" id="2_planet"]
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 1
+background_color = Color(0.015, 0.025, 0.045, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.15, 0.2, 0.3, 1)
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Background3D" type="SubViewportContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="Background3D"]
+handle_input_locally = false
+size = Vector2i(1280, 720)
+render_target_update_mode = 4
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Background3D/SubViewport"]
+environment = SubResource("Environment_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Background3D/SubViewport"]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 5, 4, 8)
+light_color = Color(1, 0.98, 0.95, 1)
+light_energy = 1.4
+
+[node name="EarthVisual" type="Node3D" parent="Background3D/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 1.8, -0.3, -2.5)
+script = ExtResource("2_planet")
+planet_type = "Earth"
+radius = 2.2
+rotate_speed = 0.03
+
+[node name="Camera3D" type="Camera3D" parent="Background3D/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.5)
+current = true
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxHeader" type="VBoxContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.06
+anchor_top = 0.12
+anchor_right = 0.55
+anchor_bottom = 0.35
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/separation = 6
+
+[node name="LabelTitle" type="Label" parent="UI/VBoxHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 52
+text = "MISSIONFORGE"
+
+[node name="LabelSubtitle" type="Label" parent="UI/VBoxHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 18
+text = "DESIGN. LAUNCH. SURVIVE. DISCOVER."
+
+[node name="LabelTag" type="Label" parent="UI/VBoxHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 14
+text = "3D Educational Space Mission Systems Engineering Simulator
+Inspired by NASA Planetary & Earth Science Exploration"
+
+[node name="VBoxButtons" type="VBoxContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.06
+anchor_top = 0.42
+anchor_right = 0.32
+anchor_bottom = 0.82
+theme_override_constants/separation = 14
+
+[node name="BtnStart" type="Button" parent="UI/VBoxButtons"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "START MISSION"
+
+[node name="BtnRecords" type="Button" parent="UI/VBoxButtons"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "MISSION RECORDS"
+
+[node name="BtnGuide" type="Button" parent="UI/VBoxButtons"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "FLIGHT MANUAL & GUIDE"
+
+[node name="BtnQuit" type="Button" parent="UI/VBoxButtons"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "QUIT APPLICATION"
+
+[node name="Footer" type="HBoxContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -38.0
+offset_right = -32.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="LabelBadge" type="Label" parent="UI/Footer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.55, 0.68, 1)
+theme_override_font_sizes/font_size = 12
+text = "MISSIONFORGE v2.0 | Developed for NASA Space Apps Challenge 2026 | Engine: Godot 4.x"
+
+[node name="Modals" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ModalRecords" type="PanelContainer" parent="Modals"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -200.0
+offset_right = 260.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Modals/ModalRecords"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Modals/ModalRecords/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "FLIGHT ARCHIVE & RECORDS"
+horizontal_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Modals/ModalRecords/VBox"]
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RecordsList" type="VBoxContainer" parent="Modals/ModalRecords/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="BtnCloseRecords" type="Button" parent="Modals/ModalRecords/VBox"]
+layout_mode = 2
+text = "CLOSE"
+
+[node name="ModalGuide" type="PanelContainer" parent="Modals"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -240.0
+offset_right = 340.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Modals/ModalGuide"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Modals/ModalGuide/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "FLIGHT MANUAL: SYSTEMS ENGINEERING"
+horizontal_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Modals/ModalGuide/VBox"]
+custom_minimum_size = Vector2(0, 340)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Modals/ModalGuide/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[color=#00e5ff][b]THE SIX PRIMARY RESOURCES OF SPACE MISSION DESIGN:[/b][/color]
+
+[b]1. Mass (kg):[/b] Launch vehicles have strict payload fairing lift limits. Every gram counts; heavier spacecraft demand greater propellant and costlier rockets.
+
+[b]2. Power (Watts):[/b] Electrical power must balance continuous consumption. In deep space or planetary night (lunar darkness or Mars dust storms), solar arrays lose efficiency and require RTGs or battery buffers.
+
+[b]3. Budget ($ Millions):[/b] Every component adds development and launch costs. Efficient missions achieve maximum science without overspending.
+
+[b]4. Scientific Data (MB/day):[/b] Advanced sensors (radars, multispectral imagers, spectrometers) generate high volumes of data that must be stored on onboard recorders.
+
+[b]5. Communications (Mbps):[/b] Distance dictates signal strength! An omni antenna suffices for LEO, but reaching Earth from Mars requires a High-Gain parabolic dish pointed at NASA's Deep Space Network.
+
+[b]6. Reliability (%):[/b] Space is harsh! Radiation-hardened computers and high-heritage hardware prevent in-flight anomalies.
+
+[color=#ffb300][b]SCORING FORMULA:[/b][/color]
+Score = 30% Science + 25% Reliability + 20% Resource Efficiency + 15% Budget + 10% Completion"
+
+[node name="BtnCloseGuide" type="Button" parent="Modals/ModalGuide/VBox"]
+layout_mode = 2
+text = "ACKNOWLEDGE"

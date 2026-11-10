@@ -1,0 +1,289 @@
+[gd_scene load_steps=3 format=3 uid="uid://g7m8s9k0l1m2n"]
+
+[ext_resource type="Script" path="res://scripts/ui/mission_report.gd" id="1_rep"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_box"]
+bg_color = Color(0.06, 0.1, 0.16, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.18, 0.32, 0.48, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
+
+[node name="MissionReport" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_rep")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.035, 0.06, 1)
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelMain" type="PanelContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 16.0
+offset_right = -24.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_box")
+
+[node name="VBox" type="VBoxContainer" parent="UI/PanelMain"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="UI/PanelMain/VBox"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="UI/PanelMain/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LblTitle" type="Label" parent="UI/PanelMain/VBox/Header/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "MISSION EVALUATION REPORT // TERRAPULSE-1"
+
+[node name="LblRating" type="Label" parent="UI/PanelMain/VBox/Header/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "RATING: NOMINAL (FULL MISSION OBJECTIVES MET)"
+
+[node name="VBoxScore" type="VBoxContainer" parent="UI/PanelMain/VBox/Header"]
+layout_mode = 2
+alignment = 1
+
+[node name="LblScoreTag" type="Label" parent="UI/PanelMain/VBox/Header/VBoxScore"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 12
+text = "OVERALL MISSION SCORE"
+horizontal_alignment = 2
+
+[node name="LblFinalScore" type="Label" parent="UI/PanelMain/VBox/Header/VBoxScore"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 36
+text = "88.5"
+horizontal_alignment = 2
+
+[node name="HSeparator" type="HSeparator" parent="UI/PanelMain/VBox"]
+layout_mode = 2
+
+[node name="HBoxTop" type="HBoxContainer" parent="UI/PanelMain/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="PanelScores" type="PanelContainer" parent="UI/PanelMain/VBox/HBoxTop"]
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_box")
+
+[node name="VBox" type="VBoxContainer" parent="UI/PanelMain/VBox/HBoxTop/PanelScores"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="UI/PanelMain/VBox/HBoxTop/PanelScores/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "SCORING BREAKDOWN (PRD WEIGHTED FORMULA)"
+
+[node name="Grid" type="GridContainer" parent="UI/PanelMain/VBox/HBoxTop/PanelScores/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+columns = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 6
+
+[node name="LblSci" type="Label" parent="UI/PanelMain/VBox/HBoxTop/PanelScores/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 12
+text = "Scientific Achievement (30%):"
+
+[node name="ValSci" type="Label" parent="UI/PanelMain/VBox/HBoxTop/PanelScores/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "92.0 / 100"
+
+[node name="LblRel" type="Label" parent="UI/PanelMain/VBox/HBoxTop/PanelScores/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 12
+text = "Mission Reliability (25%):"
+
+[node name="ValRel" type="Label" parent="UI/PanelMain/VBox/HBoxTop/PanelScores/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "86.0 / 100"
+
+[node name="LblEff" type="Label" parent="UI/PanelMain/VBox/HBoxTop/PanelScores/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 12
+text = "Resource Efficiency (20%):"
+
+[node name="ValEff" type="Label" parent="UI/PanelMain/VBox/HBoxTop/PanelScores/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "85.0 / 100"
+
+[node name="LblBud" type="Label" parent="UI/PanelMain/VBox/HBoxTop/PanelScores/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 12
+text = "Budget Performance (15%):"
+
+[node name="ValBud" type="Label" parent="UI/PanelMain/VBox/HBoxTop/PanelScores/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "90.0 / 100"
+
+[node name="LblCom" type="Label" parent="UI/PanelMain/VBox/HBoxTop/PanelScores/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 12
+text = "Mission Completion (10%):"
+
+[node name="ValCom" type="Label" parent="UI/PanelMain/VBox/HBoxTop/PanelScores/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "100.0 / 100"
+
+[node name="PanelTakeaways" type="PanelContainer" parent="UI/PanelMain/VBox/HBoxTop"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_box")
+
+[node name="VBox" type="VBoxContainer" parent="UI/PanelMain/VBox/HBoxTop/PanelTakeaways"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="UI/PanelMain/VBox/HBoxTop/PanelTakeaways/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+text = "NASA SCIENTIFIC & ENGINEERING TAKEAWAYS"
+
+[node name="Scroll" type="ScrollContainer" parent="UI/PanelMain/VBox/HBoxTop/PanelTakeaways/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ListTakeaways" type="VBoxContainer" parent="UI/PanelMain/VBox/HBoxTop/PanelTakeaways/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="HBoxBottom" type="HBoxContainer" parent="UI/PanelMain/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PanelFeedback" type="PanelContainer" parent="UI/PanelMain/VBox/HBoxBottom"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_box")
+
+[node name="VBox" type="VBoxContainer" parent="UI/PanelMain/VBox/HBoxBottom/PanelFeedback"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="UI/PanelMain/VBox/HBoxBottom/PanelFeedback/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "ROOT-CAUSE ENGINEERING ANALYSIS & DEBRIEF"
+
+[node name="Scroll" type="ScrollContainer" parent="UI/PanelMain/VBox/HBoxBottom/PanelFeedback/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxFeedback" type="VBoxContainer" parent="UI/PanelMain/VBox/HBoxBottom/PanelFeedback/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="LblStrengths" type="Label" parent="UI/PanelMain/VBox/HBoxBottom/PanelFeedback/VBox/Scroll/VBoxFeedback"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 12
+text = "STRENGTHS & NOMINAL FACTORS:"
+
+[node name="ListStrengths" type="VBoxContainer" parent="UI/PanelMain/VBox/HBoxBottom/PanelFeedback/VBox/Scroll/VBoxFeedback"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="LblWeaknesses" type="Label" parent="UI/PanelMain/VBox/HBoxBottom/PanelFeedback/VBox/Scroll/VBoxFeedback"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+theme_override_font_sizes/font_size = 12
+text = "ANOMALIES & SYSTEM BOTTLENECKS:"
+
+[node name="ListWeaknesses" type="VBoxContainer" parent="UI/PanelMain/VBox/HBoxBottom/PanelFeedback/VBox/Scroll/VBoxFeedback"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="LblRecs" type="Label" parent="UI/PanelMain/VBox/HBoxBottom/PanelFeedback/VBox/Scroll/VBoxFeedback"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 12
+text = "ENGINEERING RECOMMENDATIONS FOR NEXT FLIGHT:"
+
+[node name="ListRecs" type="VBoxContainer" parent="UI/PanelMain/VBox/HBoxBottom/PanelFeedback/VBox/Scroll/VBoxFeedback"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Footer" type="HBoxContainer" parent="UI/PanelMain/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="BtnRedesign" type="Button" parent="UI/PanelMain/VBox/Footer"]
+custom_minimum_size = Vector2(240, 40)
+layout_mode = 2
+text = "RE-CONFIGURE SPACECRAFT ↺"
+
+[node name="BtnNewMission" type="Button" parent="UI/PanelMain/VBox/Footer"]
+custom_minimum_size = Vector2(220, 40)
+layout_mode = 2
+text = "SELECT ANOTHER MISSION"
+
+[node name="Spacer" type="Control" parent="UI/PanelMain/VBox/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BtnMenu" type="Button" parent="UI/PanelMain/VBox/Footer"]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+text = "RETURN TO MAIN MENU"

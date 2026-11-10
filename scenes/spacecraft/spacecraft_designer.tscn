@@ -1,0 +1,357 @@
+[gd_scene load_steps=5 format=3 uid="uid://e5m6s7k8l9m0n"]
+
+[ext_resource type="Script" path="res://scripts/ui/designer_ui.gd" id="1_des"]
+[ext_resource type="Script" path="res://scripts/visuals/spacecraft_preview.gd" id="2_prev"]
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 1
+background_color = Color(0.02, 0.03, 0.05, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.2, 0.25, 0.35, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.06, 0.1, 0.16, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.18, 0.32, 0.48, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+
+[node name="SpacecraftDesigner" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_des")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.035, 0.06, 1)
+
+[node name="VBoxMain" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 10.0
+offset_right = -12.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="HeaderBar" type="PanelContainer" parent="VBoxMain"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="HBox" type="HBoxContainer" parent="VBoxMain/HeaderBar"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="LblTitle" type="Label" parent="VBoxMain/HeaderBar/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "SPACECRAFT ASSEMBLY FACILITY //"
+
+[node name="LblCraft" type="Label" parent="VBoxMain/HeaderBar/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 13
+text = "VEHICLE CALLSIGN:"
+
+[node name="EditCraftName" type="LineEdit" parent="VBoxMain/HeaderBar/HBox"]
+custom_minimum_size = Vector2(180, 28)
+layout_mode = 2
+text = "Odyssey-1"
+
+[node name="Spacer" type="Control" parent="VBoxMain/HeaderBar/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LblMissionName" type="Label" parent="VBoxMain/HeaderBar/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+text = "MISSION: TERRAPULSE-1"
+
+[node name="HBoxCenter" type="HBoxContainer" parent="VBoxMain"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="PanelLeft" type="PanelContainer" parent="VBoxMain/HBoxCenter"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="VBoxMain/HBoxCenter/PanelLeft"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LblCat" type="Label" parent="VBoxMain/HBoxCenter/PanelLeft/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "HARDWARE CATALOG"
+
+[node name="ScrollCat" type="ScrollContainer" parent="VBoxMain/HBoxCenter/PanelLeft/VBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+vertical_scroll_mode = 0
+
+[node name="HBoxCat" type="HBoxContainer" parent="VBoxMain/HBoxCenter/PanelLeft/VBox/ScrollCat"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BtnCatAll" type="Button" parent="VBoxMain/HBoxCenter/PanelLeft/VBox/ScrollCat/HBoxCat"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "ALL"
+
+[node name="BtnCatStruct" type="Button" parent="VBoxMain/HBoxCenter/PanelLeft/VBox/ScrollCat/HBoxCat"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "STRUCTURE"
+
+[node name="BtnCatPower" type="Button" parent="VBoxMain/HBoxCenter/PanelLeft/VBox/ScrollCat/HBoxCat"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "POWER"
+
+[node name="BtnCatInst" type="Button" parent="VBoxMain/HBoxCenter/PanelLeft/VBox/ScrollCat/HBoxCat"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "INSTRUMENTS"
+
+[node name="BtnCatComm" type="Button" parent="VBoxMain/HBoxCenter/PanelLeft/VBox/ScrollCat/HBoxCat"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "COMMS"
+
+[node name="BtnCatProp" type="Button" parent="VBoxMain/HBoxCenter/PanelLeft/VBox/ScrollCat/HBoxCat"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "PROPULSION"
+
+[node name="BtnCatLand" type="Button" parent="VBoxMain/HBoxCenter/PanelLeft/VBox/ScrollCat/HBoxCat"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "LANDING"
+
+[node name="BtnCatData" type="Button" parent="VBoxMain/HBoxCenter/PanelLeft/VBox/ScrollCat/HBoxCat"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "DATA"
+
+[node name="ScrollComps" type="ScrollContainer" parent="VBoxMain/HBoxCenter/PanelLeft/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ListComps" type="VBoxContainer" parent="VBoxMain/HBoxCenter/PanelLeft/VBox/ScrollComps"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ViewportContainer" type="SubViewportContainer" parent="VBoxMain/HBoxCenter"]
+layout_mode = 2
+size_flags_horizontal = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="VBoxMain/HBoxCenter/ViewportContainer"]
+handle_input_locally = false
+size = Vector2i(520, 580)
+render_target_update_mode = 4
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="VBoxMain/HBoxCenter/ViewportContainer/SubViewport"]
+environment = SubResource("Environment_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="VBoxMain/HBoxCenter/ViewportContainer/SubViewport"]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 3, 4, 4)
+light_color = Color(1, 0.98, 0.95, 1)
+light_energy = 1.6
+
+[node name="SpacecraftPreview" type="Node3D" parent="VBoxMain/HBoxCenter/ViewportContainer/SubViewport"]
+script = ExtResource("2_prev")
+
+[node name="Overlay3D" type="Label" parent="VBoxMain/HBoxCenter/ViewportContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(0.4, 0.5, 0.65, 1)
+theme_override_font_sizes/font_size = 11
+text = "  [Left Mouse: Orbit View | Scroll: Zoom In/Out]"
+
+[node name="PanelRight" type="PanelContainer" parent="VBoxMain/HBoxCenter"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="VBoxMain/HBoxCenter/PanelRight"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LblResTitle" type="Label" parent="VBoxMain/HBoxCenter/PanelRight/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "SYSTEMS RESOURCE DASHBOARD"
+
+[node name="GridMeters" type="VBoxContainer" parent="VBoxMain/HBoxCenter/PanelRight/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="LblMass" type="Label" parent="VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 11
+text = "Launch Vehicle Mass Capacity:"
+
+[node name="BarMass" type="ProgressBar" parent="VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+show_percentage = false
+
+[node name="LblMassVal" type="Label" parent="VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "0 / 1250 kg"
+
+[node name="LblCost" type="Label" parent="VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 11
+text = "Total Mission Budget:"
+
+[node name="BarCost" type="ProgressBar" parent="VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+show_percentage = false
+
+[node name="LblCostVal" type="Label" parent="VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "$0M / $280M"
+
+[node name="LblPower" type="Label" parent="VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 11
+text = "Electrical Power Balance:"
+
+[node name="BarPower" type="ProgressBar" parent="VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+show_percentage = false
+
+[node name="LblPowerVal" type="Label" parent="VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Net: 0 W"
+
+[node name="LblCommsVal" type="Label" parent="VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 11
+text = "Comms Bandwidth: 0 Mbps"
+
+[node name="LblDeltaVVal" type="Label" parent="VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 11
+text = "Impulse Delta-V: 0 m/s"
+
+[node name="LblRelVal" type="Label" parent="VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 11
+text = "Calculated Reliability: 100%"
+
+[node name="LblScienceVal" type="Label" parent="VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 11
+text = "Installed Science: 0 Pts"
+
+[node name="HSeparator1" type="HSeparator" parent="VBoxMain/HBoxCenter/PanelRight/VBox"]
+layout_mode = 2
+
+[node name="LblSelTitle" type="Label" parent="VBoxMain/HBoxCenter/PanelRight/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "INSTALLED FLIGHT HARDWARE"
+
+[node name="ScrollSelected" type="ScrollContainer" parent="VBoxMain/HBoxCenter/PanelRight/VBox"]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ListSelected" type="VBoxContainer" parent="VBoxMain/HBoxCenter/PanelRight/VBox/ScrollSelected"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="HSeparator2" type="HSeparator" parent="VBoxMain/HBoxCenter/PanelRight/VBox"]
+layout_mode = 2
+
+[node name="LblValidStatus" type="Label" parent="VBoxMain/HBoxCenter/PanelRight/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "STATUS: CHECKING..."
+
+[node name="ScrollWarnings" type="ScrollContainer" parent="VBoxMain/HBoxCenter/PanelRight/VBox"]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ListWarnings" type="VBoxContainer" parent="VBoxMain/HBoxCenter/PanelRight/VBox/ScrollWarnings"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="FooterBar" type="PanelContainer" parent="VBoxMain"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="HBox" type="HBoxContainer" parent="VBoxMain/FooterBar"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="BtnBriefing" type="Button" parent="VBoxMain/FooterBar/HBox"]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+text = "◀ MISSION BRIEFING"
+
+[node name="BtnClear" type="Button" parent="VBoxMain/FooterBar/HBox"]
+custom_minimum_size = Vector2(140, 36)
+layout_mode = 2
+text = "CLEAR ALL"
+
+[node name="Spacer" type="Control" parent="VBoxMain/FooterBar/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BtnLaunch" type="Button" parent="VBoxMain/FooterBar/HBox"]
+custom_minimum_size = Vector2(240, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "LAUNCH MISSION SIMULATION ➔"

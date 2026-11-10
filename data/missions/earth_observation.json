@@ -1,0 +1,40 @@
+{
+  "mission_id": "earth_observation",
+  "mission_name": "TerraPulse-1",
+  "subtitle": "Global Climate & Environmental Sentinel",
+  "destination": "Earth",
+  "difficulty": "Standard",
+  "budget_limit": 280.0,
+  "mass_limit": 1250.0,
+  "power_requirement": 220.0,
+  "communication_requirement": 20.0,
+  "duration_days": 1095.0,
+  "scientific_target": 100.0,
+  "min_delta_v": 350.0,
+  "required_components": [
+    "bus_medium_sat",
+    "inst_multispectral_imager",
+    "data_rad_computer"
+  ],
+  "recommended_components": [
+    "power_solar_deployable",
+    "comm_medium_horn",
+    "prop_monoprop",
+    "data_solid_state_recorder"
+  ],
+  "brief_overview": "Deploy a high-resolution remote-sensing observatory into Sun-Synchronous Low Earth Orbit (705 km altitude) to measure ecosystem health, forest carbon stocks, and urban heat islands.",
+  "objectives": [
+    "Achieve stable 705 km Sun-synchronous circular orbit.",
+    "Perform global 16-day repeat multispectral imagery acquisition.",
+    "Maintain positive electrical energy balance during 35-minute orbital eclipse phases.",
+    "Downlink calibrated multispectral datasets to NASA ground receiving stations."
+  ],
+  "engineering_constraints": [
+    "LEO Drag Compensation: Atmospheric drag requires attitude control and propulsion for orbit maintenance.",
+    "Orbital Eclipse: Satellite spends ~35 minutes of every 98-minute orbit in Earth's shadow; battery buffering is critical.",
+    "High Data Rate: Optical and SAR sensors generate heavy daily datasets requiring sufficient recorder capacity and downlink bandwidth."
+  ],
+  "educational_context": "Earth observation satellites utilize Sun-synchronous orbits so they cross the equator at the same local solar time on every pass, providing consistent shadow angles and lighting for multi-year environmental comparisons. NASA's Earth Observing System (EOS) operates satellites like Terra, Aqua, and Landsat to monitor planetary changes.",
+  "nasa_reference_title": "NASA Earth Science & Landsat Program",
+  "nasa_reference_url": "https://science.nasa.gov/earth-science/"
+}

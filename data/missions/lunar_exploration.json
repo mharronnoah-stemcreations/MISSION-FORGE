@@ -1,0 +1,42 @@
+{
+  "mission_id": "lunar_exploration",
+  "mission_name": "Artemis Prospector",
+  "subtitle": "Shackleton Polar Regolith Explorer",
+  "destination": "Moon",
+  "difficulty": "Challenging",
+  "budget_limit": 450.0,
+  "mass_limit": 1850.0,
+  "power_requirement": 280.0,
+  "communication_requirement": 25.0,
+  "duration_days": 180.0,
+  "scientific_target": 120.0,
+  "min_delta_v": 1800.0,
+  "required_components": [
+    "bus_medium_sat",
+    "land_lunar_legs",
+    "inst_lunar_drill",
+    "data_rad_computer"
+  ],
+  "recommended_components": [
+    "prop_biprop",
+    "power_solar_deployable",
+    "power_li_battery",
+    "comm_medium_horn",
+    "inst_lunar_seismometer"
+  ],
+  "brief_overview": "Execute Trans-Lunar Injection (TLI), enter lunar polar orbit, and complete an autonomous soft landing on the illuminated rim of Shackleton Crater to drill into shadowed permanently shadowed regions (PSRs) for water ice.",
+  "objectives": [
+    "Perform precision Trans-Lunar Injection and Lunar Orbit Capture burn.",
+    "Execute powered terminal descent to soft landing at Shackleton Crater rim within 100m CEP.",
+    "Deploy 1-meter coring drill to extract regolith volatile samples.",
+    "Survive lunar polar low-sun elevation thermal conditions and maintain communication line-of-sight to Earth."
+  ],
+  "engineering_constraints": [
+    "Landing Delta-V: Braking from 1.7 km/s orbital speed to zero touchdown velocity requires high-thrust bipropellant propulsion and dedicated landing legs.",
+    "Thermal Extremes: The Moon features extreme thermal swings (+120°C in sunlight to -230°C in permanently shadowed craters).",
+    "Communications Line-of-Sight: Polar topography can obscure direct line-of-sight with Earth ground stations."
+  ],
+  "educational_context": "Water ice discovered at the lunar poles is not only vital for drinking and life support for future Artemis astronauts, but can also be split via electrolysis into liquid hydrogen and oxygen rocket propellant, transforming the Moon into an interplanetary fueling station.",
+  "nasa_reference_title": "NASA Artemis Program & Lunar Discovery and Exploration Program",
+  "nasa_reference_url": "https://www.nasa.gov/artemis-program/"
+}
