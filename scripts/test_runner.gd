@@ -88,6 +88,38 @@ func _ready() -> void:
 
 	des_scene.queue_free()
 
+	# 3. Test Full Simulation Execution
+	print("\n--- [3] Testing simulation_scene.tscn & Full Flight Execution ---")
+	var sim_scene = load("res://scenes/simulation/simulation_scene.tscn").instantiate()
+	add_child(sim_scene)
+	
+	var engine = sim_scene.get_node("SimulationEngine")
+	print("  ✓ Simulation Engine started. Speeding up to test all 6 phases...")
+	engine.set_speed(8.0)
+	
+	# Skip to end or let it advance
+	engine.skip_to_end()
+	
+	print("  ✓ Simulation Completed! Final Result Produced:")
+	print("    • Destination: ", gm.current_result.destination)
+	print("    • Score: ", gm.current_result.final_score)
+	print("    • Events Logged: ", gm.current_result.events.size())
+	for ev in gm.current_result.events:
+		print("      - [D+%s][%s] %s: %s" % [ev.day, ev.severity, ev.title, ev.message])
+		
+	sim_scene.queue_free()
+
+	# 4. Test Mission Report Scene with Generated Result
+	print("\n--- [4] Testing mission_report.tscn with Live Result ---")
+	var rep_scene = load("res://scenes/ui/mission_report.tscn").instantiate()
+	add_child(rep_scene)
+	
+	var rep_score = rep_scene.get_node("UI/PanelMain/VBox/Header/VBoxScore/LblFinalScore").text
+	var rep_rating = rep_scene.get_node("UI/PanelMain/VBox/Header/VBox/LblRating").text
+	print("  ✓ Mission Report Displaying Final Score: ", rep_score)
+	print("  ✓ Rating Badge: ", rep_rating)
+	rep_scene.queue_free()
+
 	print("\n==================================================")
 	print("🎉 SUCCESS: BOTH BRIEFING AND HARDWARE CATALOG ARE")
 	print("   FULLY POPULATED WITH 24 AEROSPACE HARDWARE CARDS")

@@ -6,7 +6,7 @@ extends Control
 
 @onready var lbl_title: Label = $UI/PanelMain/VBox/Header/VBox/LblTitle
 @onready var lbl_rating: Label = $UI/PanelMain/VBox/Header/VBox/LblRating
-@onready var lbl_final_score: Label = $UI/PanelMain/VBox/Header/LblFinalScore
+@onready var lbl_final_score: Label = $UI/PanelMain/VBox/Header/VBoxScore/LblFinalScore
 
 # Category scores
 @onready var val_sci: Label = $UI/PanelMain/VBox/HBoxTop/PanelScores/VBox/Grid/ValSci

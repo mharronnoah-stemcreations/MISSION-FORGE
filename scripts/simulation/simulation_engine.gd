@@ -177,7 +177,7 @@ func _update_telemetry(delta: float) -> void:
 
 func _advance_phase() -> void:
 	phase_progress = 0.0
-	current_phase = SimPhase(int(current_phase) + 1)
+	current_phase = ((int(current_phase) + 1) as SimPhase)
 	if current_phase <= SimPhase.COMPLETED:
 		_trigger_phase_start(current_phase)
 
