@@ -418,31 +418,73 @@ func _build_rcs_blocks() -> void:
 
 func _build_lunar_landing_gear() -> void:
 	var leg_mat = StandardMaterial3D.new()
-	leg_mat.albedo_color = Color(0.85, 0.75, 0.2) # Gold foil legs
-	leg_mat.metallic = 0.9
+	leg_mat.albedo_color = Color(0.9, 0.78, 0.22) # Apollo Gold foil MLI
+	leg_mat.metallic = 0.92
+	leg_mat.roughness = 0.25
+
+	var pad_mat = StandardMaterial3D.new()
+	pad_mat.albedo_color = Color(0.75, 0.78, 0.82) # Titanium / Inconel crushable pad
+	pad_mat.metallic = 0.95
+	pad_mat.roughness = 0.3
 
 	var leg_angles = [PI / 4.0, 3.0 * PI / 4.0, 5.0 * PI / 4.0, 7.0 * PI / 4.0]
 	for ang in leg_angles:
-		var leg = MeshInstance3D.new()
-		var cyl = CylinderMesh.new()
-		cyl.top_radius = 0.025
-		cyl.bottom_radius = 0.025
-		cyl.height = 0.7
-		leg.mesh = cyl
-		leg.position = Vector3(cos(ang) * 0.65, -0.5, sin(ang) * 0.65)
-		leg.rotation.z = cos(ang) * 0.4
-		leg.rotation.x = sin(ang) * 0.4
-		leg.material_override = leg_mat
-		_root_node.add_child(leg)
+		var dir_x = cos(ang)
+		var dir_z = sin(ang)
 
-		# Footpad
+		# Upper chassis mounting bracket on body
+		var start_pos = Vector3(dir_x * 0.44, -0.32, dir_z * 0.44)
+		# Outer landing footpad position (splayed OUTWARD and DOWNWARD)
+		var foot_pos = Vector3(dir_x * 0.95, -0.78, dir_z * 0.95)
+		var dist = start_pos.distance_to(foot_pos)
+
+		# Main landing gear strut (points directly from body outward-downward to footpad)
+		var mount = Node3D.new()
+		_root_node.add_child(mount)
+		mount.position = start_pos
+		mount.look_at(foot_pos, Vector3.UP)
+
+		var strut = MeshInstance3D.new()
+		var s_cyl = CylinderMesh.new()
+		s_cyl.top_radius = 0.028
+		s_cyl.bottom_radius = 0.028
+		s_cyl.height = dist
+		strut.mesh = s_cyl
+		strut.position = Vector3(0.0, 0.0, -dist * 0.5)
+		strut.rotation.x = PI / 2.0
+		strut.material_override = leg_mat
+		mount.add_child(strut)
+
+		# Diagonal A-frame brace from lower bus
+		var brace_start = Vector3(dir_x * 0.32, -0.48, dir_z * 0.32)
+		var brace_mid = start_pos.lerp(foot_pos, 0.6)
+		var brace_dist = brace_start.distance_to(brace_mid)
+
+		var brace_mount = Node3D.new()
+		_root_node.add_child(brace_mount)
+		brace_mount.position = brace_start
+		brace_mount.look_at(brace_mid, Vector3.UP)
+
+		var brace_strut = MeshInstance3D.new()
+		var b_cyl = CylinderMesh.new()
+		b_cyl.top_radius = 0.016
+		b_cyl.bottom_radius = 0.016
+		b_cyl.height = brace_dist
+		brace_strut.mesh = b_cyl
+		brace_strut.position = Vector3(0.0, 0.0, -brace_dist * 0.5)
+		brace_strut.rotation.x = PI / 2.0
+		brace_strut.material_override = leg_mat
+		brace_mount.add_child(brace_strut)
+
+		# Wide Footpad at the base (flat on the lunar regolith ground)
 		var pad = MeshInstance3D.new()
 		var p_cyl = CylinderMesh.new()
-		p_cyl.top_radius = 0.09
-		p_cyl.bottom_radius = 0.09
-		p_cyl.height = 0.02
+		p_cyl.top_radius = 0.13
+		p_cyl.bottom_radius = 0.15
+		p_cyl.height = 0.025
 		pad.mesh = p_cyl
-		pad.position = Vector3(cos(ang) * 0.8, -0.8, sin(ang) * 0.8)
+		pad.position = foot_pos
+		pad.material_override = pad_mat
 		_root_node.add_child(pad)
 
 func _build_aeroshell_capsule() -> void:
