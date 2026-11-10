@@ -23,6 +23,15 @@ extends Control
 
 var _selected_id: String = "earth_observation"
 
+func _gm() -> Node:
+	return get_node_or_null("/root/GameManager")
+
+func _mm() -> Node:
+	return get_node_or_null("/root/MissionManager")
+
+func _sm() -> Node:
+	return get_node_or_null("/root/SceneManager")
+
 func _ready() -> void:
 	UITheme.style_button(btn_earth, false)
 	UITheme.style_button(btn_moon, false)
@@ -40,12 +49,17 @@ func _ready() -> void:
 
 func _select_mission_by_id(m_id: String) -> void:
 	_selected_id = m_id
-	var mission = MissionManager.get_mission(m_id)
+	var mm = _mm()
+	if mm == null:
+		return
+
+	var mission = mm.get_mission(m_id)
 	if mission == null:
 		return
 
 	# Update 3D Planet
-	planet_visual.planet_type = mission.destination
+	if planet_visual != null:
+		planet_visual.planet_type = mission.destination
 
 	# Highlight active button
 	_update_button_highlights()
@@ -87,10 +101,16 @@ func _update_button_highlights() -> void:
 			btn.add_theme_color_override("font_color", UITheme.COLOR_TEXT_WHITE)
 
 func _on_proceed_pressed() -> void:
-	var mission = MissionManager.get_mission(_selected_id)
-	if mission != null:
-		GameManager.select_mission(mission)
-		SceneManager.switch_to_scene("briefing")
+	var mm = _mm()
+	var gm = _gm()
+	var sm = _sm()
+	if mm != null and gm != null and sm != null:
+		var mission = mm.get_mission(_selected_id)
+		if mission != null:
+			gm.select_mission(mission)
+			sm.switch_to_scene("briefing")
 
 func _on_back_pressed() -> void:
-	SceneManager.switch_to_scene("main_menu")
+	var sm = _sm()
+	if sm != null:
+		sm.switch_to_scene("main_menu")

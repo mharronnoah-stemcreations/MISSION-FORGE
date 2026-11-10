@@ -26,6 +26,12 @@ extends Control
 @onready var btn_new_mission: Button = $UI/PanelMain/VBox/Footer/BtnNewMission
 @onready var btn_menu: Button = $UI/PanelMain/VBox/Footer/BtnMenu
 
+func _gm() -> Node:
+	return get_node_or_null("/root/GameManager")
+
+func _sm() -> Node:
+	return get_node_or_null("/root/SceneManager")
+
 func _ready() -> void:
 	UITheme.style_button(btn_redesign, true)
 	UITheme.style_button(btn_new_mission, false)
@@ -38,7 +44,8 @@ func _ready() -> void:
 	_populate_report()
 
 func _populate_report() -> void:
-	var result = GameManager.current_result if GameManager != null else null
+	var gm = _gm()
+	var result = gm.current_result if gm != null else null
 	if result == null:
 		# Fallback preview demo result
 		result = MissionResult.new()
@@ -134,10 +141,16 @@ func _populate_report() -> void:
 		list_takeaways.add_child(l)
 
 func _on_redesign_pressed() -> void:
-	SceneManager.switch_to_scene("designer")
+	var sm = _sm()
+	if sm != null:
+		sm.switch_to_scene("designer")
 
 func _on_new_mission_pressed() -> void:
-	SceneManager.switch_to_scene("mission_selection")
+	var sm = _sm()
+	if sm != null:
+		sm.switch_to_scene("mission_selection")
 
 func _on_menu_pressed() -> void:
-	SceneManager.switch_to_scene("main_menu")
+	var sm = _sm()
+	if sm != null:
+		sm.switch_to_scene("main_menu")

@@ -4,8 +4,8 @@ extends Control
 # Detailed pre-flight mission directive detailing scientific milestones,
 # engineering constraints, and authentic NASA program heritage.
 
-@onready var lbl_header: Label = $UI/PanelMain/VBox/Header/LblMissionTitle
-@onready var lbl_subtitle: Label = $UI/PanelMain/VBox/Header/LblSubtitle
+@onready var lbl_header: Label = $UI/PanelMain/VBox/Header/VBoxTitles/LblMissionTitle
+@onready var lbl_subtitle: Label = $UI/PanelMain/VBox/Header/VBoxTitles/LblSubtitle
 @onready var lbl_destination: Label = $UI/PanelMain/VBox/Header/LblDestination
 
 @onready var val_budget: Label = $UI/PanelMain/VBox/HBoxTop/PanelConstraints/VBox/Grid/ValBudget
@@ -32,11 +32,14 @@ func _ready() -> void:
 	_populate_briefing()
 
 func _populate_briefing() -> void:
-	var mission = GameManager.current_mission if GameManager != null else null
-	if mission == null:
-		mission = MissionManager.get_mission("earth_observation") if MissionManager != null else null
-		if mission != null and GameManager != null:
-			GameManager.select_mission(mission)
+	var gm = get_node_or_null("/root/GameManager")
+	var mm = get_node_or_null("/root/MissionManager")
+
+	var mission: MissionConfig = gm.current_mission if gm != null else null
+	if mission == null and mm != null:
+		mission = mm.get_mission("earth_observation")
+		if mission != null and gm != null:
+			gm.select_mission(mission)
 
 	if mission == null:
 		return
@@ -67,7 +70,7 @@ func _populate_briefing() -> void:
 	for child in list_required.get_children():
 		child.queue_free()
 	for req_id in mission.required_components:
-		var comp = MissionManager.get_component(req_id) if MissionManager != null else null
+		var comp = mm.get_component(req_id) if mm != null else null
 		var lbl = Label.new()
 		lbl.text = "★ " + (comp.display_name if comp != null else req_id)
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -83,7 +86,11 @@ func _populate_briefing() -> void:
 	rtxt_nasa.text += "[color=#80b3ff]" + mission.nasa_reference_url + "[/color]"
 
 func _on_design_pressed() -> void:
-	SceneManager.switch_to_scene("designer")
+	var sm = get_node_or_null("/root/SceneManager")
+	if sm != null:
+		sm.switch_to_scene("designer")
 
 func _on_back_pressed() -> void:
-	SceneManager.switch_to_scene("mission_selection")
+	var sm = get_node_or_null("/root/SceneManager")
+	if sm != null:
+		sm.switch_to_scene("mission_selection")

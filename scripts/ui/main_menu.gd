@@ -15,6 +15,15 @@ extends Control
 @onready var btn_close_records: Button = $Modals/ModalRecords/VBox/BtnCloseRecords
 @onready var btn_close_guide: Button = $Modals/ModalGuide/VBox/BtnCloseGuide
 
+func _gm() -> Node:
+	return get_node_or_null("/root/GameManager")
+
+func _mm() -> Node:
+	return get_node_or_null("/root/MissionManager")
+
+func _sm() -> Node:
+	return get_node_or_null("/root/SceneManager")
+
 func _ready() -> void:
 	UITheme.style_button(btn_start, true)
 	UITheme.style_button(btn_records, false)
@@ -35,8 +44,9 @@ func _ready() -> void:
 	modal_guide.visible = false
 
 func _on_start_pressed() -> void:
-	if SceneManager != null:
-		SceneManager.switch_to_scene("mission_selection")
+	var sm = _sm()
+	if sm != null:
+		sm.switch_to_scene("mission_selection")
 
 func _on_records_pressed() -> void:
 	_populate_records()
@@ -52,7 +62,10 @@ func _populate_records() -> void:
 	for child in records_container.get_children():
 		child.queue_free()
 
-	if GameManager == null or GameManager.mission_records.is_empty():
+	var gm = _gm()
+	var mm = _mm()
+
+	if gm == null or gm.mission_records.is_empty():
 		var lbl = Label.new()
 		lbl.text = "No mission records recorded yet. Complete your first mission simulation!"
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -60,9 +73,9 @@ func _populate_records() -> void:
 		records_container.add_child(lbl)
 		return
 
-	for m_id in GameManager.mission_records.keys():
-		var rec = GameManager.mission_records[m_id]
-		var mission = MissionManager.get_mission(m_id) if MissionManager != null else null
+	for m_id in gm.mission_records.keys():
+		var rec = gm.mission_records[m_id]
+		var mission = mm.get_mission(m_id) if mm != null else null
 		var m_title = mission.mission_name if mission != null else m_id
 
 		var card = PanelContainer.new()

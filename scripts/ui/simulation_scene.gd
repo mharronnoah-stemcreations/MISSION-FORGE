@@ -37,6 +37,18 @@ extends Control
 var _is_paused: bool = false
 var _craft_preview_builder: SpacecraftPreview
 
+func _gm() -> Node:
+	return get_node_or_null("/root/GameManager")
+
+func _mm() -> Node:
+	return get_node_or_null("/root/MissionManager")
+
+func _sm() -> Node:
+	return get_node_or_null("/root/SceneManager")
+
+func _am() -> Node:
+	return get_node_or_null("/root/AudioManager")
+
 func _ready() -> void:
 	UITheme.style_button(btn_pause, false)
 	UITheme.style_button(btn_1x, true)
@@ -58,17 +70,23 @@ func _ready() -> void:
 	_init_simulation()
 
 func _init_simulation() -> void:
-	var mission = GameManager.current_mission
-	var spacecraft = GameManager.current_spacecraft
+	var gm = _gm()
+	var mm = _mm()
 
-	if mission == null:
-		mission = MissionManager.get_mission("earth_observation")
-		GameManager.select_mission(mission)
+	var mission = gm.current_mission if gm != null else null
+	var spacecraft = gm.current_spacecraft if gm != null else null
+
+	if mission == null and mm != null:
+		mission = mm.get_mission("earth_observation")
+		if gm != null:
+			gm.select_mission(mission)
 	if spacecraft == null:
 		spacecraft = SpacecraftConfig.new()
 
-	planet_node.planet_type = mission.destination
-	lbl_mission_name.text = "FLIGHT TELEMETRY // " + mission.mission_name.to_upper()
+	if planet_node != null and mission != null:
+		planet_node.planet_type = mission.destination
+	if mission != null:
+		lbl_mission_name.text = "FLIGHT TELEMETRY // " + mission.mission_name.to_upper()
 
 	# Build spacecraft 3D mesh
 	_craft_preview_builder = SpacecraftPreview.new()
@@ -78,8 +96,9 @@ func _init_simulation() -> void:
 
 	# Launch engine
 	sim_engine.start_simulation(spacecraft, mission)
-	if AudioManager != null:
-		AudioManager.play_launch()
+	var am = _am()
+	if am != null:
+		am.play_launch()
 
 func _process(delta: float) -> void:
 	# Subtle 3D dynamic camera and spacecraft motion based on phase
@@ -127,8 +146,9 @@ func _on_skip_pressed() -> void:
 
 func _on_phase_changed(phase_idx: int, phase_name: String) -> void:
 	lbl_phase.text = phase_name.to_upper()
-	if AudioManager != null:
-		AudioManager.play_telemetry()
+	var am = _am()
+	if am != null:
+		am.play_telemetry()
 
 func _on_telemetry_updated(telemetry: Dictionary) -> void:
 	bar_phase_progress.value = telemetry.get("progress", 0.0) * 100.0
@@ -151,7 +171,7 @@ func _on_telemetry_updated(telemetry: Dictionary) -> void:
 
 func _on_event_occurred(ev: Dictionary) -> void:
 	var row = HBoxContainer.new()
-	row.theme_override_constants.separation = 8
+	row.add_theme_constant_override("separation", 8)
 
 	var time_lbl = Label.new()
 	time_lbl.text = "[D+%.1f]" % ev.get("day", 0.0)
@@ -160,15 +180,16 @@ func _on_event_occurred(ev: Dictionary) -> void:
 
 	var sev = ev.get("severity", "info")
 	var sev_lbl = Label.new()
+	var am = _am()
 	match sev:
 		"critical":
 			sev_lbl.text = "[CRIT]"
 			sev_lbl.add_theme_color_override("font_color", UITheme.COLOR_DANGER)
-			if AudioManager != null: AudioManager.play_error()
+			if am != null: am.play_error()
 		"warning":
 			sev_lbl.text = "[WARN]"
 			sev_lbl.add_theme_color_override("font_color", UITheme.COLOR_WARNING)
-			if AudioManager != null: AudioManager.play_warning()
+			if am != null: am.play_warning()
 		"success":
 			sev_lbl.text = "[OK]"
 			sev_lbl.add_theme_color_override("font_color", UITheme.COLOR_SUCCESS)
@@ -192,11 +213,15 @@ func _on_event_occurred(ev: Dictionary) -> void:
 
 	# Auto-scroll to bottom of event log
 	await get_tree().process_frame
-	scroll_events.scroll_vertical = int(scroll_events.get_v_scroll_bar().max_value)
+	if scroll_events != null and scroll_events.get_v_scroll_bar() != null:
+		scroll_events.scroll_vertical = int(scroll_events.get_v_scroll_bar().max_value)
 
 func _on_simulation_finished(result: MissionResult) -> void:
-	if AudioManager != null:
-		AudioManager.play_success()
+	var am = _am()
+	if am != null:
+		am.play_success()
 	# Transition to Mission Report after short delay
 	await get_tree().create_timer(1.2).timeout
-	SceneManager.switch_to_scene("report")
+	var sm = _sm()
+	if sm != null:
+		sm.switch_to_scene("report")

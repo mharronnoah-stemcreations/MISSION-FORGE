@@ -41,18 +41,21 @@ func select_mission(mission: MissionConfig) -> void:
 	emit_signal("spacecraft_updated", current_spacecraft)
 
 func _apply_starter_template(mission: MissionConfig) -> void:
-	if MissionManager == null:
+	var mm = null
+	if Engine.get_main_loop() is SceneTree and Engine.get_main_loop().root:
+		mm = Engine.get_main_loop().root.get_node_or_null("MissionManager")
+	if mm == null:
 		return
 	# Give user standard structural bus
 	if mission.destination == "Mars":
-		var rover_bus = MissionManager.get_component("chassis_mars_rover")
+		var rover_bus = mm.get_component("chassis_mars_rover")
 		if rover_bus: current_spacecraft.add_component(rover_bus)
 	else:
-		var sat_bus = MissionManager.get_component("bus_medium_sat")
+		var sat_bus = mm.get_component("bus_medium_sat")
 		if sat_bus: current_spacecraft.add_component(sat_bus)
 		
 	# Flight computer standard
-	var comp = MissionManager.get_component("data_rad_computer")
+	var comp = mm.get_component("data_rad_computer")
 	if comp: current_spacecraft.add_component(comp)
 
 func set_mission_result(result: MissionResult) -> void:

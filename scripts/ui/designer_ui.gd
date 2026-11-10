@@ -46,10 +46,31 @@ extends Control
 var _current_filter: String = "All"
 var _last_validation: ValidationResult
 
+func _gm() -> Node:
+	return get_node_or_null("/root/GameManager")
+
+func _mm() -> Node:
+	return get_node_or_null("/root/MissionManager")
+
+func _sm() -> Node:
+	return get_node_or_null("/root/SceneManager")
+
 func _ready() -> void:
 	UITheme.style_button(btn_briefing, false)
 	UITheme.style_button(btn_clear, false)
 	UITheme.style_button(btn_launch, true)
+
+	var gm = _gm()
+	var mm = _mm()
+
+	# Auto-initialize default mission and spacecraft if opened directly
+	if gm != null:
+		if gm.current_mission == null and mm != null:
+			var def_m = mm.get_mission("earth_observation")
+			if def_m != null:
+				gm.select_mission(def_m)
+		if gm.current_spacecraft == null:
+			gm.current_spacecraft = SpacecraftConfig.new()
 
 	var cat_buttons = [
 		btn_cat_all, btn_cat_struct, btn_cat_power, btn_cat_inst,
@@ -71,15 +92,16 @@ func _ready() -> void:
 	btn_clear.pressed.connect(_on_clear_pressed)
 	btn_launch.pressed.connect(_on_launch_pressed)
 
-	if GameManager.current_spacecraft != null and not GameManager.current_spacecraft.spacecraft_name.is_empty():
-		edit_craft_name.text = GameManager.current_spacecraft.spacecraft_name
+	if gm != null and gm.current_spacecraft != null and not gm.current_spacecraft.spacecraft_name.is_empty():
+		edit_craft_name.text = gm.current_spacecraft.spacecraft_name
 	edit_craft_name.text_changed.connect(func(n_name):
-		if GameManager.current_spacecraft != null:
-			GameManager.current_spacecraft.spacecraft_name = n_name
+		var cur_gm = _gm()
+		if cur_gm != null and cur_gm.current_spacecraft != null:
+			cur_gm.current_spacecraft.spacecraft_name = n_name
 	)
 
-	if GameManager.current_mission != null:
-		lbl_mission_name.text = "MISSION: " + GameManager.current_mission.mission_name.to_upper()
+	if gm != null and gm.current_mission != null:
+		lbl_mission_name.text = "MISSION: " + gm.current_mission.mission_name.to_upper()
 	else:
 		lbl_mission_name.text = "MISSION: UNASSIGNED"
 
@@ -94,10 +116,11 @@ func _populate_components_list() -> void:
 	for child in list_components.get_children():
 		child.queue_free()
 
-	if MissionManager == null:
+	var mm = _mm()
+	if mm == null:
 		return
 
-	var all_comps = MissionManager.get_all_components()
+	var all_comps = mm.get_all_components()
 	for comp in all_comps:
 		if _current_filter != "All" and comp.category != _current_filter:
 			continue
@@ -107,14 +130,17 @@ func _populate_components_list() -> void:
 
 func _create_component_item_card(comp: SpaceComponent) -> Control:
 	var card = PanelContainer.new()
-	var is_installed = GameManager.current_spacecraft.has_component(comp.id)
+	var is_installed = false
+	var gm = _gm()
+	if gm != null and gm.current_spacecraft != null:
+		is_installed = gm.current_spacecraft.has_component(comp.id)
 
 	var bg_col = Color(0.10, 0.16, 0.25, 0.95) if is_installed else Color(0.06, 0.09, 0.15, 0.90)
 	var border_col = UITheme.COLOR_ACCENT_CYAN if is_installed else UITheme.COLOR_BORDER
 	card.add_theme_stylebox_override("panel", UITheme.create_panel_style(bg_col, border_col, 4))
 
 	var vbox = VBoxContainer.new()
-	vbox.theme_override_constants.separation = 4
+	vbox.add_theme_constant_override("separation", 4)
 
 	# Title + Add/Remove Button
 	var hbox_top = HBoxContainer.new()
@@ -136,7 +162,7 @@ func _create_component_item_card(comp: SpaceComponent) -> Control:
 
 	# Stats bar
 	var hbox_stats = HBoxContainer.new()
-	hbox_stats.theme_override_constants.separation = 10
+	hbox_stats.add_theme_constant_override("separation", 10)
 	
 	var stat_text = "Mass: %.0fkg | Cost: $%.1fM" % [comp.mass, comp.cost]
 	if comp.power_generation > 0.0:
@@ -170,17 +196,24 @@ func _create_component_item_card(comp: SpaceComponent) -> Control:
 	return card
 
 func _toggle_component(comp: SpaceComponent) -> void:
-	if GameManager.current_spacecraft.has_component(comp.id):
-		GameManager.current_spacecraft.remove_component_by_id(comp.id)
+	var gm = _gm()
+	if gm == null or gm.current_spacecraft == null:
+		return
+	if gm.current_spacecraft.has_component(comp.id):
+		gm.current_spacecraft.remove_component_by_id(comp.id)
 	else:
-		GameManager.current_spacecraft.add_component(comp)
+		gm.current_spacecraft.add_component(comp)
 
 	_populate_components_list()
 	_update_all()
 
 func _update_all() -> void:
-	var sc = GameManager.current_spacecraft
-	var mission = GameManager.current_mission
+	var gm = _gm()
+	if gm == null or gm.current_spacecraft == null:
+		return
+
+	var sc = gm.current_spacecraft
+	var mission = gm.current_mission
 	sc.recalculate()
 
 	# 1. Update 3D Preview
@@ -303,12 +336,18 @@ func _update_all() -> void:
 
 func _on_launch_pressed() -> void:
 	if _last_validation != null and _last_validation.is_valid:
-		SceneManager.switch_to_scene("simulation")
+		var sm = _sm()
+		if sm != null:
+			sm.switch_to_scene("simulation")
 
 func _on_clear_pressed() -> void:
-	GameManager.current_spacecraft.clear()
+	var gm = _gm()
+	if gm != null and gm.current_spacecraft != null:
+		gm.current_spacecraft.clear()
 	_populate_components_list()
 	_update_all()
 
 func _on_briefing_pressed() -> void:
-	SceneManager.switch_to_scene("briefing")
+	var sm = _sm()
+	if sm != null:
+		sm.switch_to_scene("briefing")

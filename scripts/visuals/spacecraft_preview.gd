@@ -20,9 +20,9 @@ func _ready() -> void:
 	add_child(_cam_pivot)
 
 	_orbit_cam = Camera3D.new()
+	_cam_pivot.add_child(_orbit_cam)
 	_orbit_cam.position = Vector3(0, 0.8, _cam_distance)
 	_orbit_cam.look_at(Vector3.ZERO, Vector3.UP)
-	_cam_pivot.add_child(_orbit_cam)
 
 	_root_node = Node3D.new()
 	add_child(_root_node)
