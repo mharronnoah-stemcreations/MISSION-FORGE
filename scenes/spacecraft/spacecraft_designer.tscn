@@ -197,13 +197,15 @@ mouse_filter = 2
 
 [node name="Toolbar3D" type="HBoxContainer" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay"]
 layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 10.0
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -225.0
 offset_top = 10.0
-offset_right = -10.0
+offset_right = 225.0
 offset_bottom = 42.0
 grow_horizontal = 2
+alignment = 1
 theme_override_constants/separation = 8
 
 [node name="BtnExploded" type="Button" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
@@ -212,20 +214,14 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "⚡ EXPLODED VIEW"
 
-[node name="SpacerLeft" type="Control" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
-layout_mode = 2
-size_flags_horizontal = 3
-
 [node name="LblViewStatus" type="Label" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
+custom_minimum_size = Vector2(180, 30)
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.9, 1, 1)
 theme_override_font_sizes/font_size = 11
 text = "CAD VIEW: ASSEMBLED"
 horizontal_alignment = 1
-
-[node name="SpacerRight" type="Control" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
-layout_mode = 2
-size_flags_horizontal = 3
+vertical_alignment = 1
 
 [node name="BtnResetCam" type="Button" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
 custom_minimum_size = Vector2(110, 30)
