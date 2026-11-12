@@ -39,6 +39,9 @@ extends Control
 @onready var lbl_valid_status: Label = $VBoxMain/HBoxCenter/PanelRight/VBox/LblValidStatus
 
 # 3D Viewport Controls & Inspection Card
+@onready var viewport_container: SubViewportContainer = $VBoxMain/HBoxCenter/ViewportContainer
+@onready var viewport_overlay: Control = $VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay
+@onready var toolbar_3d: Control = $VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D
 @onready var btn_exploded: Button = $VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D/BtnExploded
 @onready var btn_reset_cam: Button = $VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D/BtnResetCam
 @onready var lbl_view_status: Label = $VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D/LblViewStatus
@@ -83,6 +86,10 @@ func _ready() -> void:
 	if lbl_view_status != null:
 		var sb_status = UITheme.create_panel_style(Color(0.04, 0.08, 0.16, 0.88), Color(0.0, 0.85, 1.0, 0.5), 4)
 		lbl_view_status.add_theme_stylebox_override("normal", sb_status)
+
+	if viewport_container != null:
+		viewport_container.resized.connect(_reposition_toolbar)
+		call_deferred("_reposition_toolbar")
 
 	if preview_3d != null:
 		preview_3d.component_inspected.connect(_on_component_inspected_from_3d)
@@ -472,3 +479,17 @@ func _show_component_inspection(comp: SpaceComponent) -> void:
 		lbl_inspect_heritage.text = "🏛️ NASA Heritage: " + comp.nasa_heritage
 	else:
 		lbl_inspect_heritage.visible = false
+
+func _reposition_toolbar() -> void:
+	if viewport_overlay == null or viewport_container == null:
+		return
+	viewport_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	if toolbar_3d != null:
+		var tb_w = toolbar_3d.get_combined_minimum_size().x
+		if tb_w <= 0.0:
+			tb_w = 425.0
+		toolbar_3d.offset_left = -tb_w * 0.5
+		toolbar_3d.offset_right = tb_w * 0.5
+		toolbar_3d.offset_top = 10.0
+		toolbar_3d.offset_bottom = 42.0
