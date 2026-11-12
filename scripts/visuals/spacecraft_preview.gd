@@ -111,6 +111,10 @@ func rebuild_spacecraft(spacecraft: SpacecraftConfig) -> void:
 				_build_battery_pack()
 			"avionics_computer":
 				_build_avionics_box()
+			"lunar_micro_rover":
+				_build_lunar_micro_rover()
+			"prop_tank":
+				_build_aux_propellant_tank()
 
 # --- Procedural Mesh Helpers ---
 
@@ -534,3 +538,72 @@ func _build_avionics_box() -> void:
 	mat.albedo_color = Color(0.3, 0.3, 0.35)
 	avi.material_override = mat
 	_root_node.add_child(avi)
+
+func _build_lunar_micro_rover() -> void:
+	# Autonomous Lunar Micro-Rover mounted to lander deploy bracket
+	var rover_root = Node3D.new()
+	rover_root.position = Vector3(0.52, -0.15, 0.0)
+
+	var chassis = MeshInstance3D.new()
+	var box = BoxMesh.new()
+	box.size = Vector3(0.24, 0.10, 0.28)
+	chassis.mesh = box
+	var c_mat = StandardMaterial3D.new()
+	c_mat.albedo_color = Color(0.85, 0.72, 0.2) # Kapton Gold
+	c_mat.metallic = 0.8
+	c_mat.roughness = 0.3
+	chassis.material_override = c_mat
+	rover_root.add_child(chassis)
+
+	# 4 micro-rover wheels
+	var w_mat = StandardMaterial3D.new()
+	w_mat.albedo_color = Color(0.15, 0.16, 0.18)
+	w_mat.metallic = 0.7
+	var wheel_offsets = [
+		Vector3(-0.13, -0.06, 0.11), Vector3(0.13, -0.06, 0.11),
+		Vector3(-0.13, -0.06, -0.11), Vector3(0.13, -0.06, -0.11)
+	]
+	for w_pos in wheel_offsets:
+		var wheel = MeshInstance3D.new()
+		var cyl = CylinderMesh.new()
+		cyl.top_radius = 0.045
+		cyl.bottom_radius = 0.045
+		cyl.height = 0.03
+		wheel.mesh = cyl
+		wheel.rotation.z = PI / 2.0
+		wheel.position = w_pos
+		wheel.material_override = w_mat
+		rover_root.add_child(wheel)
+
+	# Mini sensor mast & headlight
+	var mast = MeshInstance3D.new()
+	var mast_cyl = CylinderMesh.new()
+	mast_cyl.top_radius = 0.012
+	mast_cyl.bottom_radius = 0.012
+	mast_cyl.height = 0.12
+	mast.mesh = mast_cyl
+	mast.position = Vector3(0.06, 0.10, 0.08)
+	var m_mat = StandardMaterial3D.new()
+	m_mat.albedo_color = Color(0.9, 0.9, 0.9)
+	mast.material_override = m_mat
+	rover_root.add_child(mast)
+
+	_root_node.add_child(rover_root)
+
+func _build_aux_propellant_tank() -> void:
+	# Twin composite overwrapped propellant tanks
+	var tank_mat = StandardMaterial3D.new()
+	tank_mat.albedo_color = Color(0.75, 0.78, 0.82) # Titanium Composite
+	tank_mat.metallic = 0.9
+	tank_mat.roughness = 0.2
+
+	for side in [-1.0, 1.0]:
+		var tank = MeshInstance3D.new()
+		var sphere = SphereMesh.new()
+		sphere.radius = 0.18
+		sphere.height = 0.42
+		sphere.radial_segments = 24
+		tank.mesh = sphere
+		tank.position = Vector3(side * 0.48, 0.05, 0.25)
+		tank.material_override = tank_mat
+		_root_node.add_child(tank)

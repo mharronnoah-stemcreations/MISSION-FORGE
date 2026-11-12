@@ -1,7 +1,7 @@
 {
   "mission_id": "lunar_exploration",
   "mission_name": "Artemis Prospector",
-  "subtitle": "Shackleton Polar Regolith Explorer",
+  "subtitle": "Shackleton Polar Regolith & PSR Water-Ice Explorer",
   "destination": "Moon",
   "difficulty": "Challenging",
   "budget_limit": 450.0,
@@ -21,22 +21,54 @@
     "prop_biprop",
     "power_solar_deployable",
     "power_li_battery",
+    "mobility_lunar_rover",
     "comm_medium_horn",
     "inst_lunar_seismometer"
   ],
-  "brief_overview": "Execute Trans-Lunar Injection (TLI), enter lunar polar orbit, and complete an autonomous soft landing on the illuminated rim of Shackleton Crater to drill into shadowed permanently shadowed regions (PSRs) for water ice.",
+  "brief_overview": "Execute Trans-Lunar Injection (TLI), enter lunar polar orbit, and complete an autonomous soft landing on the illuminated rim of Shackleton Crater (89.9°S). Deploy coring drills and an autonomous micro-rover into Permanently Shadowed Regions (PSRs) to prospect for cryo-trapped water ice volatiles.",
+  "nasa_landing_sites": [
+    {
+      "name": "Site Alpha: Connecting Ridge (Peak of Eternal Light)",
+      "coordinates": "89.9°S, 0.0°E",
+      "annual_illumination": "86%",
+      "slope_degrees": 9.2,
+      "earth_line_of_sight": "92%",
+      "water_ice_wt_pct": "1.5%",
+      "description": "High ridge connecting Shackleton to de Gerlache crater. Exceptional solar illumination and direct Earth telecom link; requires deployable micro-rover to traverse into dark crater floor."
+    },
+    {
+      "name": "Site Beta: Shackleton Crater Rim Saddle",
+      "coordinates": "89.7°S, 120.0°W",
+      "annual_illumination": "68%",
+      "slope_degrees": 14.5,
+      "earth_line_of_sight": "81%",
+      "water_ice_wt_pct": "2.8%",
+      "description": "Lower rim elevation with periodic shadow cycles. Good compromise between landing safety and proximity to volatile-rich cold traps."
+    },
+    {
+      "name": "Site Gamma: Permanently Shadowed Crater Interior (PSR Floor)",
+      "coordinates": "89.9°S, 180.0°E",
+      "annual_illumination": "0% (Perpetual Darkness)",
+      "slope_degrees": 24.0,
+      "earth_line_of_sight": "0% (Direct RF blocked)",
+      "water_ice_wt_pct": "5.5%",
+      "description": "Cryogenic floor at 40 Kelvin (-233°C). Highest concentration of surface water ice detected by LRO LOLA/Diviner; requires nuclear RTG or massive battery storage and communications relay."
+    }
+  ],
   "objectives": [
-    "Perform precision Trans-Lunar Injection and Lunar Orbit Capture burn.",
+    "Perform precision Trans-Lunar Injection and 1.8 km/s Lunar Orbit Insertion & landing burn.",
     "Execute powered terminal descent to soft landing at Shackleton Crater rim within 100m CEP.",
-    "Deploy 1-meter coring drill to extract regolith volatile samples.",
-    "Survive lunar polar low-sun elevation thermal conditions and maintain communication line-of-sight to Earth."
+    "Deploy 1-meter coring drill and autonomous micro-rover into permanently shadowed regions.",
+    "Survive lunar polar low-sun elevation thermal conditions and maintain communication line-of-sight to Earth.",
+    "Quantify sub-surface hydrogen and volatile abundance for Artemis In-Situ Resource Utilization (ISRU)."
   ],
   "engineering_constraints": [
     "Landing Delta-V: Braking from 1.7 km/s orbital speed to zero touchdown velocity requires high-thrust bipropellant propulsion and dedicated landing legs.",
-    "Thermal Extremes: The Moon features extreme thermal swings (+120°C in sunlight to -230°C in permanently shadowed craters).",
-    "Communications Line-of-Sight: Polar topography can obscure direct line-of-sight with Earth ground stations."
+    "Extreme Cryogenic Thermal Environment: Temperatures swing from +120°C in sunlight to 40 Kelvin (-233°C) inside Shackleton Crater PSRs.",
+    "Communications Line-of-Sight: Lunar south pole topography can obscure direct line-of-sight with Earth ground stations; medium-gain horn or relay required.",
+    "Surface Mobility Requirement: A stationary lander on the rim cannot traverse the steep 30° crater wall without a dedicated micro-rover platform."
   ],
-  "educational_context": "Water ice discovered at the lunar poles is not only vital for drinking and life support for future Artemis astronauts, but can also be split via electrolysis into liquid hydrogen and oxygen rocket propellant, transforming the Moon into an interplanetary fueling station.",
-  "nasa_reference_title": "NASA Artemis Program & Lunar Discovery and Exploration Program",
-  "nasa_reference_url": "https://www.nasa.gov/artemis-program/"
+  "educational_context": "Data from NASA's Lunar Reconnaissance Orbiter (LRO) LOLA altimeter, Diviner thermal radiometer, and KPLO ShadowCam revealed that the interior of Shackleton Crater is one of the coldest places in the solar system (40 Kelvin), allowing water ice to remain stable for billions of years. Water ice at the lunar poles can be split into hydrogen and oxygen rocket propellant, enabling sustainable human exploration under the NASA Artemis campaign.",
+  "nasa_reference_title": "NASA LRO / LOLA Science & Artemis South Pole Exploration",
+  "nasa_reference_url": "https://lunar.gsfc.nasa.gov/"
 }

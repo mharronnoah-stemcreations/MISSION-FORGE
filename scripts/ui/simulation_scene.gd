@@ -3,7 +3,7 @@ extends Control
 # SimulationScene
 # Real-time 3D mission simulation and Mission Control telemetry interface.
 # Coordinates deterministic simulation engine ticks, 3D trajectory visualization,
-# live telemetry streaming, and mission event feed.
+# live telemetry streaming, in-flight interactive decisions, and mission event feed.
 
 @onready var sim_engine: SimulationEngine = $SimulationEngine
 @onready var planet_node: PlanetVisualizer = $ViewportContainer/SubViewport/PlanetNode
@@ -34,6 +34,12 @@ extends Control
 @onready var btn_4x: Button = $UI/PanelControls/HBox/Btn4x
 @onready var btn_skip: Button = $UI/PanelControls/HBox/BtnSkip
 
+# Interactive Decision Modal
+@onready var modal_decision: PanelContainer = $UI/ModalDecision
+@onready var lbl_dec_header: Label = $UI/ModalDecision/VBox/LblDecHeader
+@onready var lbl_dec_context: Label = $UI/ModalDecision/VBox/LblDecContext
+@onready var vbox_options: VBoxContainer = $UI/ModalDecision/VBox/VBoxOptions
+
 var _is_paused: bool = false
 var _craft_preview_builder: SpacecraftPreview
 
@@ -56,6 +62,9 @@ func _ready() -> void:
 	UITheme.style_button(btn_4x, false)
 	UITheme.style_button(btn_skip, false)
 
+	modal_decision.visible = false
+	modal_decision.add_theme_stylebox_override("panel", UITheme.create_panel_style(Color(0.04, 0.08, 0.15, 0.98), UITheme.COLOR_ACCENT_GOLD, 6))
+
 	btn_pause.pressed.connect(_on_pause_toggle)
 	btn_1x.pressed.connect(func(): _set_speed(1.0, btn_1x))
 	btn_2x.pressed.connect(func(): _set_speed(2.0, btn_2x))
@@ -65,6 +74,7 @@ func _ready() -> void:
 	sim_engine.phase_changed.connect(_on_phase_changed)
 	sim_engine.telemetry_updated.connect(_on_telemetry_updated)
 	sim_engine.event_occurred.connect(_on_event_occurred)
+	sim_engine.decision_requested.connect(_on_decision_requested)
 	sim_engine.simulation_finished.connect(_on_simulation_finished)
 
 	_init_simulation()
@@ -142,6 +152,8 @@ func _set_speed(speed: float, active_btn: Button) -> void:
 		UITheme.style_button(b, b == active_btn)
 
 func _on_skip_pressed() -> void:
+	if modal_decision.visible:
+		modal_decision.visible = false
 	sim_engine.skip_to_end()
 
 func _on_phase_changed(phase_idx: int, phase_name: String) -> void:
@@ -153,7 +165,10 @@ func _on_phase_changed(phase_idx: int, phase_name: String) -> void:
 func _on_telemetry_updated(telemetry: Dictionary) -> void:
 	bar_phase_progress.value = telemetry.get("progress", 0.0) * 100.0
 
-	val_time.text = "Day %.1f" % telemetry.get("mission_elapsed_days", 0.0)
+	val_time.text = "Day %.1f / %.0f" % [
+		telemetry.get("mission_elapsed_days", 0.0),
+		sim_engine.total_mission_target_days
+	]
 	
 	var alt = telemetry.get("altitude_km", 0.0)
 	if alt > 10000.0:
@@ -162,12 +177,24 @@ func _on_telemetry_updated(telemetry: Dictionary) -> void:
 		val_alt.text = "%.1f km" % alt
 
 	val_vel.text = "%.2f km/s" % telemetry.get("velocity_kms", 0.0)
-	val_bat.text = "%.0f%%" % telemetry.get("battery_percent", 100.0)
+	
+	var bat_pct = telemetry.get("battery_percent", 100.0)
+	var bat_wh = telemetry.get("battery_wh", 1200.0)
+	var net_w = telemetry.get("power_net_w", 0.0)
+	val_bat.text = "%.0f%% (%.0f Wh | %+.0fW)" % [bat_pct, bat_wh, net_w]
+	if bat_pct < 25.0:
+		val_bat.add_theme_color_override("font_color", UITheme.COLOR_DANGER)
+	elif bat_pct < 60.0:
+		val_bat.add_theme_color_override("font_color", UITheme.COLOR_WARNING)
+	else:
+		val_bat.add_theme_color_override("font_color", UITheme.COLOR_SUCCESS)
+
 	val_sig.text = "+%.1f dB" % telemetry.get("signal_margin_db", 20.0)
 
 	var d_col = telemetry.get("data_collected", 0.0)
 	var d_down = telemetry.get("data_downlinked", 0.0)
-	val_data.text = "%.0f / %.0f MB" % [d_down, d_col]
+	var d_buf = telemetry.get("data_buffered", 0.0)
+	val_data.text = "%.0f DL / %.0f Buf MB" % [d_down, d_buf]
 
 func _on_event_occurred(ev: Dictionary) -> void:
 	var row = HBoxContainer.new()
@@ -216,10 +243,43 @@ func _on_event_occurred(ev: Dictionary) -> void:
 	if scroll_events != null and scroll_events.get_v_scroll_bar() != null:
 		scroll_events.scroll_vertical = int(scroll_events.get_v_scroll_bar().max_value)
 
-func _on_simulation_finished(result: MissionResult) -> void:
+func _on_decision_requested(dec_data: Dictionary) -> void:
+	lbl_dec_header.text = dec_data.get("title", "FLIGHT DIRECTOR INTERVENTION")
+	lbl_dec_context.text = dec_data.get("context", "")
+
+	for child in vbox_options.get_children():
+		child.queue_free()
+
+	var options = dec_data.get("options", [])
+	for i in range(options.size()):
+		var opt = options[i]
+		var opt_btn = Button.new()
+		opt_btn.custom_minimum_size = Vector2(0, 52)
+		opt_btn.text = "%s\n%s" % [opt.get("title", ""), opt.get("effect", "")]
+		opt_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		UITheme.style_button(opt_btn, i == 1)
+		
+		var idx = i
+		opt_btn.pressed.connect(func():
+			modal_decision.visible = false
+			sim_engine.submit_decision(idx)
+		)
+		vbox_options.add_child(opt_btn)
+
+	modal_decision.visible = true
 	var am = _am()
 	if am != null:
-		am.play_success()
+		am.play_warning()
+
+func _on_simulation_finished(result: MissionResult) -> void:
+	modal_decision.visible = false
+	var am = _am()
+	if am != null:
+		if result.mission_completed:
+			am.play_success()
+		else:
+			am.play_error()
+			
 	# Transition to Mission Report after short delay
 	await get_tree().create_timer(1.2).timeout
 	var sm = _sm()

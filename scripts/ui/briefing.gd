@@ -82,6 +82,26 @@ func _populate_briefing() -> void:
 	rtxt_nasa.bbcode_enabled = true
 	rtxt_nasa.text = "[color=#00e5ff][b]NASA HERITAGE & SCIENTIFIC PRINCIPLES:[/b][/color]\n\n"
 	rtxt_nasa.text += mission.educational_context + "\n\n"
+	
+	if not mission.nasa_landing_sites.is_empty():
+		rtxt_nasa.text += "[color=#ffd700][b]CANDIDATE NASA LANDING SITES (LRO / LOLA / SHADOWCAM):[/b][/color]\n"
+		for site in mission.nasa_landing_sites:
+			rtxt_nasa.text += "• [b]%s[/b] (%s)\n  Solar: %s | Slope: %.1f° | H2O-Ice: %s\n  [i]%s[/i]\n\n" % [
+				site.get("name", ""),
+				site.get("coordinates", ""),
+				site.get("annual_illumination", ""),
+				float(site.get("slope_degrees", 0.0)),
+				site.get("water_ice_wt_pct", ""),
+				site.get("description", "")
+			]
+			
+	if not mission.nasa_flight_parameters.is_empty():
+		rtxt_nasa.text += "[color=#00e5ff][b]MISSION FLIGHT TRAJECTORY PARAMETERS:[/b][/color]\n"
+		for param_key in mission.nasa_flight_parameters.keys():
+			var val = mission.nasa_flight_parameters[param_key]
+			rtxt_nasa.text += "• %s: [b]%s[/b]\n" % [param_key.capitalize().replace("_", " "), str(val)]
+		rtxt_nasa.text += "\n"
+
 	rtxt_nasa.text += "[color=#ffb300][b]Official NASA Reference:[/b][/color] " + mission.nasa_reference_title + "\n"
 	rtxt_nasa.text += "[color=#80b3ff]" + mission.nasa_reference_url + "[/color]"
 

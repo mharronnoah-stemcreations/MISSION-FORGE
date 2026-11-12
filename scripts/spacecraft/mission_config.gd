@@ -24,6 +24,10 @@ extends Resource
 @export var nasa_reference_title: String = ""
 @export var nasa_reference_url: String = ""
 
+# NASA Authoritative Data
+@export var nasa_landing_sites: Array[Dictionary] = []
+@export var nasa_flight_parameters: Dictionary = {}
+
 static func from_dict(dict: Dictionary) -> MissionConfig:
 	var cfg = MissionConfig.new()
 	cfg.mission_id = dict.get("mission_id", "")
@@ -59,4 +63,11 @@ static func from_dict(dict: Dictionary) -> MissionConfig:
 	cfg.educational_context = dict.get("educational_context", "")
 	cfg.nasa_reference_title = dict.get("nasa_reference_title", "")
 	cfg.nasa_reference_url = dict.get("nasa_reference_url", "")
+	
+	cfg.nasa_landing_sites.clear()
+	for site in dict.get("nasa_landing_sites", []):
+		if site is Dictionary:
+			cfg.nasa_landing_sites.append(site)
+			
+	cfg.nasa_flight_parameters = dict.get("nasa_flight_parameters", {})
 	return cfg

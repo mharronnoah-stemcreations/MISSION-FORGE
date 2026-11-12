@@ -6,11 +6,11 @@
   "difficulty": "Standard",
   "budget_limit": 280.0,
   "mass_limit": 1250.0,
-  "power_requirement": 220.0,
+  "power_requirement": 200.0,
   "communication_requirement": 20.0,
   "duration_days": 1095.0,
   "scientific_target": 100.0,
-  "min_delta_v": 350.0,
+  "min_delta_v": 250.0,
   "required_components": [
     "bus_medium_sat",
     "inst_multispectral_imager",
@@ -18,23 +18,32 @@
   ],
   "recommended_components": [
     "power_solar_deployable",
+    "power_li_battery",
     "comm_medium_horn",
     "prop_monoprop",
     "data_solid_state_recorder"
   ],
-  "brief_overview": "Deploy a high-resolution remote-sensing observatory into Sun-Synchronous Low Earth Orbit (705 km altitude) to measure ecosystem health, forest carbon stocks, and urban heat islands.",
+  "brief_overview": "Deploy a high-resolution remote-sensing observatory into a 705 km Sun-Synchronous Low Earth Orbit (98.2° inclination) with a 16-day global repeat ground track to monitor global carbon sinks, deforestation, and climate indicators.",
+  "nasa_flight_parameters": {
+    "orbit_type": "Sun-Synchronous Low Earth Orbit (SSO)",
+    "altitude_km": 705.0,
+    "inclination_deg": 98.2,
+    "orbital_period_minutes": 98.8,
+    "eclipse_duration_minutes": 35.2,
+    "repeat_cycle_days": 16.0
+  },
   "objectives": [
-    "Achieve stable 705 km Sun-synchronous circular orbit.",
-    "Perform global 16-day repeat multispectral imagery acquisition.",
-    "Maintain positive electrical energy balance during 35-minute orbital eclipse phases.",
-    "Downlink calibrated multispectral datasets to NASA ground receiving stations."
+    "Achieve stable 705 km Sun-synchronous circular orbit at 98.2° inclination.",
+    "Perform global 16-day repeat multispectral imagery acquisition across 9 spectral bands.",
+    "Maintain positive electrical energy balance and thermal control during 35-minute orbital eclipse phases.",
+    "Downlink calibrated multispectral datasets to NASA Near Space Network ground stations."
   ],
   "engineering_constraints": [
-    "LEO Drag Compensation: Atmospheric drag requires attitude control and propulsion for orbit maintenance.",
-    "Orbital Eclipse: Satellite spends ~35 minutes of every 98-minute orbit in Earth's shadow; battery buffering is critical.",
-    "High Data Rate: Optical and SAR sensors generate heavy daily datasets requiring sufficient recorder capacity and downlink bandwidth."
+    "LEO Drag Compensation: Upper atmospheric drag at 705 km requires periodic RCS propulsion burns to maintain constellation ground track.",
+    "Orbital Eclipse Cycles: Spacecraft spends ~35 minutes of every 99-minute orbit in Earth's shadow; Li-ion battery buffering is essential.",
+    "High Data Rate: Optical pushbroom imagers and SAR sensors generate 250+ MB/day; onboard solid-state memory is required between ground passes."
   ],
-  "educational_context": "Earth observation satellites utilize Sun-synchronous orbits so they cross the equator at the same local solar time on every pass, providing consistent shadow angles and lighting for multi-year environmental comparisons. NASA's Earth Observing System (EOS) operates satellites like Terra, Aqua, and Landsat to monitor planetary changes.",
+  "educational_context": "Earth observation satellites utilize Sun-synchronous orbits so they cross the equator at the same local solar time on every pass (typically 10:00 AM descending node), providing consistent shadow angles and lighting for multi-year environmental comparisons. NASA's Earth Observing System (EOS) operates satellites like Terra, Aqua, and Landsat to monitor planetary changes.",
   "nasa_reference_title": "NASA Earth Science & Landsat Program",
   "nasa_reference_url": "https://science.nasa.gov/earth-science/"
 }

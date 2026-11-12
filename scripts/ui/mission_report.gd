@@ -59,7 +59,7 @@ func _populate_report() -> void:
 		result.strengths.append("High Scientific Output: Multispectral imager collected 100% target Earth datasets.")
 		result.recommendations.append("Equip Li-Ion battery pack to maintain instrument heaters during orbital eclipse.")
 
-	lbl_title.text = "MISSION EVALUATION REPORT // " + result.mission_name.to_upper()
+	lbl_title.text = "MISSION AFTER-ACTION REPORT // " + result.mission_name.to_upper()
 	lbl_final_score.text = "%.1f" % result.final_score
 
 	# Grade / Rating

@@ -1,7 +1,7 @@
 {
   "mission_id": "mars_rover",
   "mission_name": "Ares Pathfinder",
-  "subtitle": "Jezero Crater Astrobiology Laboratory",
+  "subtitle": "Jezero Crater Astrobiology & Sample Caching Laboratory",
   "destination": "Mars",
   "difficulty": "Complex",
   "budget_limit": 650.0,
@@ -10,7 +10,7 @@
   "communication_requirement": 40.0,
   "duration_days": 687.0,
   "scientific_target": 150.0,
-  "min_delta_v": 2200.0,
+  "min_delta_v": 1200.0,
   "required_components": [
     "chassis_mars_rover",
     "land_mars_entry",
@@ -21,24 +21,32 @@
   ],
   "recommended_components": [
     "power_rtg",
+    "power_li_battery",
     "prop_biprop",
     "inst_mastcam_stereo",
     "data_solid_state_recorder"
   ],
-  "brief_overview": "Deliver a 6-wheeled robotic astrobiology rover to Jezero Crater, Mars. Survive hypersonic atmospheric entry (EDL) and deposit sample cache tubes exploring ancient lakebed clays for signs of biosignatures.",
+  "brief_overview": "Deliver a 6-wheeled robotic astrobiology rover to Jezero Crater, Mars (18.38°N, 77.58°E). Survive hypersonic atmospheric entry (EDL), deploy rocket Sky Crane terminal descent, and collect pristine rock core samples exploring an ancient river delta for fossil biosignatures.",
+  "nasa_flight_parameters": {
+    "target_landing_site": "Jezero Crater Delta Fan (18.38°N, 77.58°E)",
+    "entry_velocity_kmh": 20000.0,
+    "one_way_light_time_minutes": "14.2 minutes (Autonomous EDL required)",
+    "surface_solar_flux_percent": "43% of Earth solar irradiance",
+    "atmospheric_entry_heating_c": 1300.0
+  },
   "objectives": [
     "Survive interplanetary cruise, trajectory correction maneuvers, and entry into Mars atmosphere.",
-    "Execute guided Entry, Descent, and Landing (EDL) sequence using supersonic parachute and rocket sky crane.",
+    "Execute autonomous guided Entry, Descent, and Landing (EDL) sequence using supersonic parachute and rocket sky crane.",
     "Deploy 6-wheel rover mobility and traverse 15+ km across ancient Jezero delta deposits.",
     "Drill and hermetically seal rock core samples searching for organic molecular biosignatures.",
-    "Transmit compressed science and high-definition panorama telemetry via Deep Space Network."
+    "Transmit compressed science and high-definition panorama telemetry via NASA Deep Space Network."
   ],
   "engineering_constraints": [
-    "The 'Seven Minutes of Terror': One-way radio light travel time from Mars to Earth is 4 to 20 minutes, meaning the entire atmospheric entry and landing sequence must be 100% autonomous.",
-    "Solar Distance & Dust: Mars receives less than 43% of Earth's solar irradiance. Dust accumulation on solar arrays drastically degrades power, making nuclear RTG systems preferable.",
+    "The 'Seven Minutes of Terror': One-way radio light travel time from Mars to Earth is 4 to 20 minutes, meaning the entire atmospheric entry, parachute deployment, and sky crane touchdown sequence must be 100% autonomous.",
+    "Solar Distance & Dust: Mars receives less than 43% of Earth's solar irradiance. Dust accumulation on solar arrays drastically degrades power, making nuclear MMRTG systems essential for 24/7 science.",
     "Mass & Budget Limits: An interplanetary rover stack (aeroshell, parachute, sky crane, rover) requires strict mass control to fit within launch vehicle fairings."
   ],
-  "educational_context": "Jezero Crater was chosen for NASA's Mars 2020 mission because it hosted an ancient lake and river delta over 3.5 billion years ago. Clay minerals deposited in the delta preserve microscopic organic structures and biomarkers if microbial life ever arose on Mars.",
+  "educational_context": "Jezero Crater was chosen for NASA's Mars 2020 mission because it hosted an ancient lake and river delta over 3.5 billion years ago. Clay minerals deposited in the delta preserve microscopic organic structures and biomarkers if microbial life ever arose on Mars. The Sky Crane maneuver allows heavy rovers to land directly on their wheels without ramps.",
   "nasa_reference_title": "NASA Mars 2020 Perseverance Rover Mission",
   "nasa_reference_url": "https://mars.nasa.gov/mars2020/"
 }

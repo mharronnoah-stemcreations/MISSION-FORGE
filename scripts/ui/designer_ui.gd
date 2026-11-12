@@ -164,18 +164,26 @@ func _create_component_item_card(comp: SpaceComponent) -> Control:
 	var hbox_stats = HBoxContainer.new()
 	hbox_stats.add_theme_constant_override("separation", 10)
 	
-	var stat_text = "Mass: %.0fkg | Cost: $%.1fM" % [comp.mass, comp.cost]
+	var stat_text = "Mass: %.0fkg" % comp.mass
+	if comp.propellant_mass > 0.0:
+		stat_text += " (Fuel: %.0fkg | Isp: %.0fs)" % [comp.propellant_mass, comp.isp_seconds]
+	stat_text += " | Cost: $%.1fM" % comp.cost
+
 	if comp.power_generation > 0.0:
 		stat_text += " | Power: +%.0fW" % comp.power_generation
 	elif comp.power_consumption > 0.0:
 		stat_text += " | Power: -%.0fW" % comp.power_consumption
 
+	if comp.battery_capacity_wh > 0.0:
+		stat_text += " | Battery: %.0fWh" % comp.battery_capacity_wh
+
+	if comp.storage_capacity_gb > 0.0:
+		stat_text += " | SSD: %.0fGB" % comp.storage_capacity_gb
+
 	if comp.science_value > 0.0:
 		stat_text += " | Sci: +%.0f" % comp.science_value
 	if comp.comms_bandwidth > 0.0:
 		stat_text += " | Comms: %.0fM" % comp.comms_bandwidth
-	if comp.delta_v_impulse > 0.0:
-		stat_text += " | dV: +%.0fm/s" % comp.delta_v_impulse
 
 	var lbl_stats = Label.new()
 	lbl_stats.text = stat_text
@@ -191,6 +199,14 @@ func _create_component_item_card(comp: SpaceComponent) -> Control:
 	lbl_desc.add_theme_color_override("font_color", UITheme.COLOR_TEXT_MUTED)
 	lbl_desc.add_theme_font_size_override("font_size", 11)
 	vbox.add_child(lbl_desc)
+
+	if not comp.nasa_heritage.is_empty():
+		var lbl_heritage = Label.new()
+		lbl_heritage.text = "🏛️ NASA Heritage: " + comp.nasa_heritage
+		lbl_heritage.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		lbl_heritage.add_theme_color_override("font_color", UITheme.COLOR_ACCENT_CYAN)
+		lbl_heritage.add_theme_font_size_override("font_size", 10)
+		vbox.add_child(lbl_heritage)
 
 	card.add_child(vbox)
 	return card
@@ -247,20 +263,22 @@ func _update_all() -> void:
 	var req_p = mission.power_requirement if mission != null else 250.0
 	bar_power.max_value = max(req_p * 1.5, sc.total_power_generation)
 	bar_power.value = max(0.0, sc.net_power)
-	lbl_power_val.text = "Net: %+.0f W (Gen: %.0fW | Con: %.0fW | Req: %.0fW)" % [
-		sc.net_power, sc.total_power_generation, sc.total_power_consumption, req_p
+	lbl_power_val.text = "Net: %+.0f W (Gen: %.0fW | Con: %.0fW | Battery: %.0f Wh)" % [
+		sc.net_power, sc.total_power_generation, sc.total_power_consumption, sc.total_battery_capacity_wh
 	]
-	if sc.net_power < req_p:
-		lbl_power_val.add_theme_color_override("font_color", UITheme.COLOR_WARNING if sc.net_power >= 0 else UITheme.COLOR_DANGER)
+	if sc.net_power < 0.0 and sc.total_battery_capacity_wh <= 0.0:
+		lbl_power_val.add_theme_color_override("font_color", UITheme.COLOR_DANGER)
+	elif sc.net_power < req_p:
+		lbl_power_val.add_theme_color_override("font_color", UITheme.COLOR_WARNING)
 	else:
 		lbl_power_val.add_theme_color_override("font_color", UITheme.COLOR_SUCCESS)
 
 	# Telemetry & Delta-V
-	lbl_comms_val.text = "Comms Bandwidth: %.1f Mbps (Target: %.1f Mbps)" % [
-		sc.comms_capacity, (mission.communication_requirement if mission != null else 10.0)
+	lbl_comms_val.text = "Comms Bandwidth: %.1f Mbps | SSD: %.0f GB (Req: %.1f Mbps)" % [
+		sc.comms_capacity, sc.total_storage_capacity_gb, (mission.communication_requirement if mission != null else 10.0)
 	]
-	lbl_deltav_val.text = "Impulse Delta-V: %.0f m/s (Target: %.0f m/s)" % [
-		sc.total_delta_v, (mission.min_delta_v if mission != null else 500.0)
+	lbl_deltav_val.text = "Rocket Delta-V: %.0f m/s (Prop: %.0fkg | Isp: %.0fs | Target: %.0f m/s)" % [
+		sc.total_delta_v, sc.total_propellant_mass, sc.effective_isp, (mission.min_delta_v if mission != null else 500.0)
 	]
 	lbl_rel_val.text = "Calculated Reliability: %.1f%%" % [sc.average_reliability * 100.0]
 	lbl_science_val.text = "Installed Science: %.0f Pts (Target: %.0f Pts)" % [
