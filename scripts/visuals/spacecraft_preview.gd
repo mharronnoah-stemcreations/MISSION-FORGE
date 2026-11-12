@@ -22,11 +22,11 @@ var highlighted_comp_id: String = ""
 var _root_node: Node3D
 var _orbit_cam: Camera3D
 var _cam_pivot: Node3D
-var _cam_distance: float = 3.6
-var _target_distance: float = 3.6
+var _cam_distance: float = 4.2
+var _target_distance: float = 4.2
 var _target_rot_y: float = 0.0
-var _target_rot_x: float = -0.15
-var _cam_target: Vector3 = Vector3(0, 0.1, 0)
+var _target_rot_x: float = -0.10
+var _cam_target: Vector3 = Vector3(0, 0.05, 0)
 
 var _is_dragging_orbit: bool = false
 var _is_dragging_pan: bool = false
@@ -43,7 +43,7 @@ func _ready() -> void:
 
 	_orbit_cam = Camera3D.new()
 	_cam_pivot.add_child(_orbit_cam)
-	_orbit_cam.position = Vector3(0, 0.4, _cam_distance)
+	_orbit_cam.position = Vector3(0, 0.25, _cam_distance)
 	_orbit_cam.look_at(_cam_target, Vector3.UP)
 
 	_root_node = Node3D.new()
@@ -75,7 +75,7 @@ func _process(delta: float) -> void:
 	_cam_distance = lerpf(_cam_distance, _target_distance, delta * 10.0)
 	_orbit_cam.position.z = _cam_distance
 	_cam_pivot.position = _cam_pivot.position.lerp(_cam_target, delta * 8.0)
-	_orbit_cam.look_at(_cam_pivot.position, Vector3.UP)
+	_orbit_cam.look_at(_cam_pivot.global_position, Vector3.UP)
 
 	# 2. Exploded-View Smooth Animation
 	var target_explosion = 1.0 if is_exploded_mode else 0.0
@@ -137,10 +137,10 @@ func toggle_exploded_view() -> bool:
 	return is_exploded_mode
 
 func reset_camera() -> void:
-	_target_distance = 3.6
+	_target_distance = 4.2
 	_target_rot_y = 0.0
-	_target_rot_x = -0.15
-	_cam_target = Vector3(0, 0.1, 0)
+	_target_rot_x = -0.10
+	_cam_target = Vector3(0, 0.05, 0)
 	highlight_component("")
 
 func highlight_component(comp_id: String) -> void:

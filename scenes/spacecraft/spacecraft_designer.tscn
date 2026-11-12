@@ -212,21 +212,26 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "⚡ EXPLODED VIEW"
 
-[node name="BtnResetCam" type="Button" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
-custom_minimum_size = Vector2(110, 30)
-layout_mode = 2
-theme_override_font_sizes/font_size = 11
-text = "⟲ RESET CAM"
-
-[node name="Spacer" type="Control" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
+[node name="SpacerLeft" type="Control" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
 layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="LblViewStatus" type="Label" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.75, 1, 0.9)
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
 theme_override_font_sizes/font_size = 11
 text = "CAD VIEW: ASSEMBLED"
+horizontal_alignment = 1
+
+[node name="SpacerRight" type="Control" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BtnResetCam" type="Button" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
+custom_minimum_size = Vector2(110, 30)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "⟲ RESET CAM"
 
 [node name="CardInspection" type="PanelContainer" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay"]
 visible = false

@@ -80,6 +80,10 @@ func _ready() -> void:
 		UITheme.style_button(btn_inspect_close, false)
 		btn_inspect_close.pressed.connect(func(): card_inspection.visible = false)
 
+	if lbl_view_status != null:
+		var sb_status = UITheme.create_panel_style(Color(0.04, 0.08, 0.16, 0.88), Color(0.0, 0.85, 1.0, 0.5), 4)
+		lbl_view_status.add_theme_stylebox_override("normal", sb_status)
+
 	if preview_3d != null:
 		preview_3d.component_inspected.connect(_on_component_inspected_from_3d)
 
