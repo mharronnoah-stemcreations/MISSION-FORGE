@@ -191,13 +191,113 @@ light_energy = 1.6
 [node name="SpacecraftPreview" type="Node3D" parent="VBoxMain/HBoxCenter/ViewportContainer/SubViewport"]
 script = ExtResource("2_prev")
 
-[node name="Overlay3D" type="Label" parent="VBoxMain/HBoxCenter/ViewportContainer"]
+[node name="ViewportOverlay" type="Control" parent="VBoxMain/HBoxCenter/ViewportContainer"]
 layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 8
+mouse_filter = 2
+
+[node name="Toolbar3D" type="HBoxContainer" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 42.0
+grow_horizontal = 2
+theme_override_constants/separation = 8
+
+[node name="BtnExploded" type="Button" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
+custom_minimum_size = Vector2(130, 30)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "⚡ EXPLODED VIEW"
+
+[node name="BtnResetCam" type="Button" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
+custom_minimum_size = Vector2(110, 30)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "⟲ RESET CAM"
+
+[node name="Spacer" type="Control" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LblViewStatus" type="Label" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.75, 1, 0.9)
+theme_override_font_sizes/font_size = 11
+text = "CAD VIEW: ASSEMBLED"
+
+[node name="CardInspection" type="PanelContainer" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay"]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -120.0
+offset_right = -12.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBoxInspect" type="VBoxContainer" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/CardInspection"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="HBoxInspectHeader" type="HBoxContainer" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/CardInspection/VBoxInspect"]
+layout_mode = 2
+
+[node name="LblInspectTitle" type="Label" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/CardInspection/VBoxInspect/HBoxInspectHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "COMPONENT INSPECTION"
+
+[node name="BtnInspectClose" type="Button" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/CardInspection/VBoxInspect/HBoxInspectHeader"]
+custom_minimum_size = Vector2(24, 22)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "✕"
+
+[node name="LblInspectSpecs" type="Label" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/CardInspection/VBoxInspect"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 11
+text = "Mass: 0 kg | Power: 0 W | Cost: $0M"
+
+[node name="LblInspectDesc" type="Label" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/CardInspection/VBoxInspect"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.82, 0.9, 1)
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 3
+text = "Description..."
+
+[node name="LblInspectHeritage" type="Label" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/CardInspection/VBoxInspect"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.8, 0.95, 1)
+theme_override_font_sizes/font_size = 10
+autowrap_mode = 3
+text = "NASA Heritage..."
+
+[node name="LblCamHint" type="Label" parent="VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -24.0
+offset_right = -12.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 0
 theme_override_colors/font_color = Color(0.4, 0.5, 0.65, 1)
 theme_override_font_sizes/font_size = 11
-text = "  [Left Mouse: Orbit View | Scroll: Zoom In/Out]"
+text = "[LMB: Orbit | RMB: Pan | Wheel: Zoom | Click Component to Focus]"
 
 [node name="PanelRight" type="PanelContainer" parent="VBoxMain/HBoxCenter"]
 custom_minimum_size = Vector2(360, 0)

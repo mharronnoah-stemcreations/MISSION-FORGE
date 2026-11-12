@@ -112,12 +112,12 @@ anchors_preset = -1
 anchor_top = 0.12
 anchor_bottom = 0.86
 offset_left = 20.0
-offset_right = 310.0
+offset_right = 340.0
 grow_vertical = 2
 
 [node name="VBox" type="VBoxContainer" parent="UI/PanelTelemetry"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 6
 
 [node name="Title" type="Label" parent="UI/PanelTelemetry/VBox"]
 layout_mode = 2
@@ -132,79 +132,120 @@ layout_mode = 2
 layout_mode = 2
 columns = 2
 theme_override_constants/h_separation = 12
-theme_override_constants/v_separation = 10
+theme_override_constants/v_separation = 6
 
 [node name="LblTime" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 11
 text = "Mission Elapsed:"
 
 [node name="ValTime" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 11
 text = "Day 0.0"
 
 [node name="LblAlt" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 11
 text = "Altitude:"
 
 [node name="ValAlt" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 11
 text = "0.0 km"
 
 [node name="LblVel" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 11
 text = "Orbital Velocity:"
 
 [node name="ValVel" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 11
 text = "0.00 km/s"
 
-[node name="LblBat" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+[node name="HSeparator2" type="HSeparator" parent="UI/PanelTelemetry/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
-theme_override_font_sizes/font_size = 12
-text = "Power Bus Reserve:"
 
-[node name="ValBat" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.2, 0.9, 0.4, 1)
-theme_override_font_sizes/font_size = 12
-text = "100%"
-
-[node name="LblSig" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
-theme_override_font_sizes/font_size = 12
-text = "DSN Signal Margin:"
-
-[node name="ValSig" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+[node name="LblGaugesTitle" type="Label" parent="UI/PanelTelemetry/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.9, 1, 1)
 theme_override_font_sizes/font_size = 12
-text = "+24.0 dB"
+text = "SUBSYSTEM HEALTH & GAUGES"
 
-[node name="LblData" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+[node name="LblBatGauge" type="Label" parent="UI/PanelTelemetry/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
-theme_override_font_sizes/font_size = 12
-text = "Downlinked Data:"
+theme_override_font_sizes/font_size = 10
+text = "BATTERY STORAGE (DOD):"
 
-[node name="ValData" type="Label" parent="UI/PanelTelemetry/VBox/Grid"]
+[node name="BarBat" type="ProgressBar" parent="UI/PanelTelemetry/VBox"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValBatFlow" type="Label" parent="UI/PanelTelemetry/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 10
+text = "100% (1200 Wh | +150W)"
+
+[node name="LblSigGauge" type="Label" parent="UI/PanelTelemetry/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 10
+text = "DSN LINK MARGIN:"
+
+[node name="BarSig" type="ProgressBar" parent="UI/PanelTelemetry/VBox"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValSigFlow" type="Label" parent="UI/PanelTelemetry/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 10
+text = "+24.0 dB [NOMINAL LINK]"
+
+[node name="LblBufGauge" type="Label" parent="UI/PanelTelemetry/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 10
+text = "SSD DATA BUFFER CAPACITY:"
+
+[node name="BarBuf" type="ProgressBar" parent="UI/PanelTelemetry/VBox"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValBufFlow" type="Label" parent="UI/PanelTelemetry/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
-theme_override_font_sizes/font_size = 12
-text = "0 / 0 MB"
+theme_override_font_sizes/font_size = 10
+text = "0 / 500 MB (0% Full)"
+
+[node name="LblPropGauge" type="Label" parent="UI/PanelTelemetry/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 10
+text = "PROPELLANT & DELTA-V:"
+
+[node name="BarProp" type="ProgressBar" parent="UI/PanelTelemetry/VBox"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValPropFlow" type="Label" parent="UI/PanelTelemetry/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 10
+text = "420 / 420 kg (Delta-V: 2373 m/s)"
 
 [node name="PanelEvents" type="PanelContainer" parent="UI"]
 layout_mode = 1
@@ -253,27 +294,60 @@ grow_vertical = 0
 
 [node name="HBox" type="HBoxContainer" parent="UI/PanelControls"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 
 [node name="BtnPause" type="Button" parent="UI/PanelControls/HBox"]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(85, 0)
 layout_mode = 2
 text = "PAUSE"
 
 [node name="Btn1x" type="Button" parent="UI/PanelControls/HBox"]
-custom_minimum_size = Vector2(60, 0)
+custom_minimum_size = Vector2(44, 0)
 layout_mode = 2
 text = "1X"
 
 [node name="Btn2x" type="Button" parent="UI/PanelControls/HBox"]
-custom_minimum_size = Vector2(60, 0)
+custom_minimum_size = Vector2(44, 0)
 layout_mode = 2
 text = "2X"
 
 [node name="Btn4x" type="Button" parent="UI/PanelControls/HBox"]
-custom_minimum_size = Vector2(60, 0)
+custom_minimum_size = Vector2(44, 0)
 layout_mode = 2
 text = "4X"
+
+[node name="VSep1" type="VSeparator" parent="UI/PanelControls/HBox"]
+layout_mode = 2
+
+[node name="LblCam" type="Label" parent="UI/PanelControls/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 11
+text = "CAM:"
+
+[node name="BtnCamVista" type="Button" parent="UI/PanelControls/HBox"]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "🌐 VISTA"
+
+[node name="BtnCamFocus" type="Button" parent="UI/PanelControls/HBox"]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "🛰️ FOCUS"
+
+[node name="BtnCamSurface" type="Button" parent="UI/PanelControls/HBox"]
+custom_minimum_size = Vector2(85, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "🏔️ SURFACE"
+
+[node name="BtnCamFree" type="Button" parent="UI/PanelControls/HBox"]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "🎥 FREE"
 
 [node name="Spacer" type="Control" parent="UI/PanelControls/HBox"]
 layout_mode = 2
@@ -283,6 +357,44 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 text = "SKIP TO REPORT ➔"
+
+[node name="PanelIntro" type="PanelContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 80.0
+offset_right = 300.0
+offset_bottom = 145.0
+grow_horizontal = 2
+
+[node name="HBoxIntro" type="HBoxContainer" parent="UI/PanelIntro"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="VBoxIntroText" type="VBoxContainer" parent="UI/PanelIntro/HBoxIntro"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LblIntroTitle" type="Label" parent="UI/PanelIntro/HBoxIntro/VBoxIntroText"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "MISSIONFORGE // TRAJECTORY INITIATION"
+
+[node name="LblIntroSub" type="Label" parent="UI/PanelIntro/HBoxIntro/VBoxIntroText"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 11
+text = "APPROACHING DESTINATION TERMINATOR..."
+
+[node name="BtnSkipIntro" type="Button" parent="UI/PanelIntro/HBoxIntro"]
+custom_minimum_size = Vector2(100, 32)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 11
+text = "SKIP INTRO ⏩"
 
 [node name="ModalDecision" type="PanelContainer" parent="UI"]
 visible = false

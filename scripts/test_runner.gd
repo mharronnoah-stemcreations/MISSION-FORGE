@@ -77,7 +77,7 @@ func _ready() -> void:
 		var c_vbox = card.get_child(0)
 		var c_top = c_vbox.get_child(0)
 		var comp_name = c_top.get_child(0).text
-		var btn_txt = c_top.get_child(1).text
+		var btn_txt = c_top.get_child(c_top.get_child_count() - 1).text
 		var comp_stats = c_vbox.get_child(1).get_child(0).text
 		print("    [%s] %s -> %s" % [btn_txt, comp_name, comp_stats])
 

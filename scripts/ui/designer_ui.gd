@@ -38,6 +38,17 @@ extends Control
 @onready var list_warnings: VBoxContainer = $VBoxMain/HBoxCenter/PanelRight/VBox/ScrollWarnings/ListWarnings
 @onready var lbl_valid_status: Label = $VBoxMain/HBoxCenter/PanelRight/VBox/LblValidStatus
 
+# 3D Viewport Controls & Inspection Card
+@onready var btn_exploded: Button = $VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D/BtnExploded
+@onready var btn_reset_cam: Button = $VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D/BtnResetCam
+@onready var lbl_view_status: Label = $VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/Toolbar3D/LblViewStatus
+@onready var card_inspection: PanelContainer = $VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/CardInspection
+@onready var lbl_inspect_title: Label = $VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/CardInspection/VBoxInspect/HBoxInspectHeader/LblInspectTitle
+@onready var btn_inspect_close: Button = $VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/CardInspection/VBoxInspect/HBoxInspectHeader/BtnInspectClose
+@onready var lbl_inspect_specs: Label = $VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/CardInspection/VBoxInspect/LblInspectSpecs
+@onready var lbl_inspect_desc: Label = $VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/CardInspection/VBoxInspect/LblInspectDesc
+@onready var lbl_inspect_heritage: Label = $VBoxMain/HBoxCenter/ViewportContainer/ViewportOverlay/CardInspection/VBoxInspect/LblInspectHeritage
+
 # Footer actions
 @onready var btn_briefing: Button = $VBoxMain/FooterBar/HBox/BtnBriefing
 @onready var btn_clear: Button = $VBoxMain/FooterBar/HBox/BtnClear
@@ -59,6 +70,18 @@ func _ready() -> void:
 	UITheme.style_button(btn_briefing, false)
 	UITheme.style_button(btn_clear, false)
 	UITheme.style_button(btn_launch, true)
+	if btn_exploded != null:
+		UITheme.style_button(btn_exploded, false)
+		btn_exploded.pressed.connect(_on_exploded_pressed)
+	if btn_reset_cam != null:
+		UITheme.style_button(btn_reset_cam, false)
+		btn_reset_cam.pressed.connect(_on_reset_cam_pressed)
+	if btn_inspect_close != null:
+		UITheme.style_button(btn_inspect_close, false)
+		btn_inspect_close.pressed.connect(func(): card_inspection.visible = false)
+
+	if preview_3d != null:
+		preview_3d.component_inspected.connect(_on_component_inspected_from_3d)
 
 	var gm = _gm()
 	var mm = _mm()
@@ -150,6 +173,17 @@ func _create_component_item_card(comp: SpaceComponent) -> Control:
 	lbl_name.add_theme_color_override("font_color", UITheme.COLOR_TEXT_WHITE)
 	lbl_name.add_theme_font_size_override("font_size", 13)
 
+	var btn_inspect = Button.new()
+	btn_inspect.text = "🔍 FOCUS"
+	btn_inspect.tooltip_text = "Highlight & inspect component in 3D viewport"
+	btn_inspect.custom_minimum_size = Vector2(70, 26)
+	UITheme.style_button(btn_inspect, false)
+	btn_inspect.pressed.connect(func():
+		if preview_3d != null:
+			preview_3d.highlight_component(comp.id)
+		_show_component_inspection(comp)
+	)
+
 	var btn_toggle = Button.new()
 	btn_toggle.text = "REMOVE" if is_installed else "+ ADD"
 	btn_toggle.custom_minimum_size = Vector2(80, 26)
@@ -157,6 +191,7 @@ func _create_component_item_card(comp: SpaceComponent) -> Control:
 	btn_toggle.pressed.connect(func(): _toggle_component(comp))
 
 	hbox_top.add_child(lbl_name)
+	hbox_top.add_child(btn_inspect)
 	hbox_top.add_child(btn_toggle)
 	vbox.add_child(hbox_top)
 
@@ -291,11 +326,19 @@ func _update_all() -> void:
 
 	for comp in sc.selected_components:
 		var h = HBoxContainer.new()
-		var l = Label.new()
-		l.text = "• " + comp.display_name
-		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		l.add_theme_font_size_override("font_size", 11)
-		l.add_theme_color_override("font_color", UITheme.COLOR_TEXT_WHITE)
+		var btn_item = Button.new()
+		btn_item.flat = true
+		btn_item.text = "• " + comp.display_name
+		btn_item.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn_item.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		btn_item.add_theme_font_size_override("font_size", 11)
+		btn_item.add_theme_color_override("font_color", UITheme.COLOR_TEXT_WHITE)
+		btn_item.tooltip_text = "Click to focus & inspect in 3D"
+		btn_item.pressed.connect(func():
+			if preview_3d != null:
+				preview_3d.highlight_component(comp.id)
+			_show_component_inspection(comp)
+		)
 
 		var b = Button.new()
 		b.text = "✕"
@@ -307,7 +350,7 @@ func _update_all() -> void:
 			_update_all()
 		)
 
-		h.add_child(l)
+		h.add_child(btn_item)
 		h.add_child(b)
 		list_selected.add_child(h)
 
@@ -369,3 +412,59 @@ func _on_briefing_pressed() -> void:
 	var sm = _sm()
 	if sm != null:
 		sm.switch_to_scene("briefing")
+
+func _on_exploded_pressed() -> void:
+	if preview_3d == null:
+		return
+	var is_exp = preview_3d.toggle_exploded_view()
+	btn_exploded.text = "⚡ COMPACT VIEW" if is_exp else "⚡ EXPLODED VIEW"
+	lbl_view_status.text = "CAD VIEW: EXPLODED SCHEMATIC" if is_exp else "CAD VIEW: ASSEMBLED"
+	UITheme.style_button(btn_exploded, is_exp)
+
+func _on_reset_cam_pressed() -> void:
+	if preview_3d != null:
+		preview_3d.reset_camera()
+	if card_inspection != null:
+		card_inspection.visible = false
+
+func _on_component_inspected_from_3d(comp_id: String) -> void:
+	var mm = _mm()
+	if mm == null:
+		return
+	var comp = mm.get_component(comp_id)
+	if comp != null:
+		_show_component_inspection(comp)
+
+func _show_component_inspection(comp: SpaceComponent) -> void:
+	if card_inspection == null:
+		return
+	card_inspection.visible = true
+	var cat_col = UITheme.get_category_color(comp.category)
+	lbl_inspect_title.text = "INSPECTION // [%s] %s" % [comp.category.to_upper(), comp.display_name]
+	lbl_inspect_title.add_theme_color_override("font_color", cat_col)
+
+	var stat_parts: Array[String] = []
+	stat_parts.append("Mass: %.0f kg" % comp.mass)
+	if comp.propellant_mass > 0.0:
+		stat_parts.append("Propellant: %.0f kg (Isp: %.0f s)" % [comp.propellant_mass, comp.isp_seconds])
+	stat_parts.append("Cost: $%.1fM" % comp.cost)
+	if comp.power_generation > 0.0:
+		stat_parts.append("Power: +%.0f W" % comp.power_generation)
+	elif comp.power_consumption > 0.0:
+		stat_parts.append("Power: -%.0f W" % comp.power_consumption)
+	if comp.battery_capacity_wh > 0.0:
+		stat_parts.append("Battery: %.0f Wh" % comp.battery_capacity_wh)
+	if comp.storage_capacity_gb > 0.0:
+		stat_parts.append("SSD: %.0f GB" % comp.storage_capacity_gb)
+	if comp.science_value > 0.0:
+		stat_parts.append("Science: +%.0f" % comp.science_value)
+	if comp.comms_bandwidth > 0.0:
+		stat_parts.append("Comms: %.0f Mbps" % comp.comms_bandwidth)
+
+	lbl_inspect_specs.text = " | ".join(stat_parts)
+	lbl_inspect_desc.text = comp.description
+	if not comp.nasa_heritage.is_empty():
+		lbl_inspect_heritage.visible = true
+		lbl_inspect_heritage.text = "🏛️ NASA Heritage: " + comp.nasa_heritage
+	else:
+		lbl_inspect_heritage.visible = false
