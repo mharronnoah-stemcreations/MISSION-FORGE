@@ -107,10 +107,10 @@ static func style_button(btn: Button, is_primary: bool = false) -> void:
 	for sb in [normal, hover, pressed]:
 		sb.set_border_width_all(1)
 		sb.set_corner_radius_all(4)
-		sb.content_margin_left = 14
-		sb.content_margin_right = 14
-		sb.content_margin_top = 8
-		sb.content_margin_bottom = 8
+		sb.content_margin_left = 16
+		sb.content_margin_right = 16
+		sb.content_margin_top = 10
+		sb.content_margin_bottom = 10
 
 	btn.add_theme_stylebox_override("normal", normal)
 	btn.add_theme_stylebox_override("hover", hover)

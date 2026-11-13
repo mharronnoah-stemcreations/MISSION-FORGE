@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://c3m4s5k6l7m8n"]
+[gd_scene load_steps=6 format=3 uid="uid://c3m4s5k6l7m8n"]
 
 [ext_resource type="Script" path="res://scripts/ui/mission_selection.gd" id="1_sel"]
 [ext_resource type="Script" path="res://scripts/visuals/planet_visualizer.gd" id="2_planet"]
@@ -9,7 +9,27 @@ background_color = Color(0.015, 0.025, 0.045, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.18, 0.22, 0.32, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.06, 0.1, 0.16, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.18, 0.32, 0.48, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 20.0
+content_margin_top = 18.0
+content_margin_right = 20.0
+content_margin_bottom = 18.0
 bg_color = Color(0.06, 0.1, 0.16, 0.92)
 border_width_left = 1
 border_width_top = 1
@@ -80,7 +100,7 @@ offset_top = 16.0
 offset_right = -24.0
 offset_bottom = 60.0
 grow_horizontal = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+theme_override_styles/panel = SubResource("StyleBoxFlat_header")
 
 [node name="HBox" type="HBoxContainer" parent="UI/HeaderBar"]
 layout_mode = 2
@@ -89,7 +109,7 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.9, 1, 1)
 theme_override_font_sizes/font_size = 18
-text = "  MISSION SELECTION // SELECT DESTINATION TARGET"
+text = "MISSION SELECTION // SELECT DESTINATION TARGET"
 
 [node name="PanelLeft" type="PanelContainer" parent="UI"]
 layout_mode = 1
@@ -112,19 +132,19 @@ theme_override_font_sizes/font_size = 14
 text = "FLIGHT SCENARIOS (3 AVAILABLE)"
 
 [node name="BtnEarth" type="Button" parent="UI/PanelLeft/VBox"]
-custom_minimum_size = Vector2(0, 50)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 text = "EARTH OBSERVATION
 Sentinel Climate Orbiter"
 
 [node name="BtnMoon" type="Button" parent="UI/PanelLeft/VBox"]
-custom_minimum_size = Vector2(0, 50)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 text = "LUNAR EXPLORATION
 Shackleton Polar Lander"
 
 [node name="BtnMars" type="Button" parent="UI/PanelLeft/VBox"]
-custom_minimum_size = Vector2(0, 50)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 text = "MARS ROVER MISSION
 Jezero Astrobiology Lab"
