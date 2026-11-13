@@ -15,7 +15,7 @@ var MissionManager: Node
 
 func _init() -> void:
 	print("==================================================")
-	print("🛰️  MISSIONFORGE AUTOMATED TEST SUITE INITIALIZED")
+	print("[MISSIONFORGE] AUTOMATED TEST SUITE INITIALIZED")
 	print("==================================================")
 
 	var mm_script = load("res://scripts/managers/mission_manager.gd")
@@ -36,9 +36,9 @@ func _init() -> void:
 
 	print("==================================================")
 	if success:
-		print("🎉 ALL MISSIONFORGE AUTOMATED TESTS PASSED (100% NOMINAL)")
+		print("ALL MISSIONFORGE AUTOMATED TESTS PASSED (100% NOMINAL)")
 	else:
-		push_error("❌ SOME TESTS FAILED")
+		push_error("SOME TESTS FAILED")
 	print("==================================================")
 
 	quit(0 if success else 1)
@@ -51,7 +51,7 @@ func _test_data_loading() -> bool:
 		return false
 
 	var all_comps = mm.get_all_components()
-	print("  ✓ Total Components Loaded: %d" % all_comps.size())
+	print("  [OK] Total Components Loaded: %d" % all_comps.size())
 	if all_comps.size() < 24:
 		push_error("FAIL: Expected at least 24 components, got %d" % all_comps.size())
 		return false
@@ -62,7 +62,7 @@ func _test_data_loading() -> bool:
 		if in_cat.is_empty():
 			push_error("FAIL: Category '%s' has 0 components." % cat)
 			return false
-		print("  ✓ Category '%s': %d components" % [cat, in_cat.size()])
+		print("  [OK] Category '%s': %d components" % [cat, in_cat.size()])
 
 	# Verify 3 mission scenarios with NASA datasets
 	for m_id in ["earth_observation", "lunar_exploration", "mars_rover"]:
@@ -70,7 +70,7 @@ func _test_data_loading() -> bool:
 		if m == null:
 			push_error("FAIL: Missing mission configuration: " + m_id)
 			return false
-		print("  ✓ Mission '%s' (%s) Loaded: Budget=$%.0fM, Mass=%.0fkg, Delta-V=%.0fm/s" % [
+		print("  [OK] Mission '%s' (%s) Loaded: Budget=$%.0fM, Mass=%.0fkg, Delta-V=%.0fm/s" % [
 			m.mission_name, m.destination, m.budget_limit, m.mass_limit, m.min_delta_v
 		])
 
@@ -79,7 +79,7 @@ func _test_data_loading() -> bool:
 	if lunar.nasa_landing_sites.size() < 3:
 		push_error("FAIL: Expected at least 3 NASA landing sites in Artemis Prospector.")
 		return false
-	print("  ✓ Artemis Prospector: %d NASA landing sites loaded (LRO/ShadowCam verified)" % lunar.nasa_landing_sites.size())
+	print("  [OK] Artemis Prospector: %d NASA landing sites loaded (LRO/ShadowCam verified)" % lunar.nasa_landing_sites.size())
 
 	return true
 
@@ -96,7 +96,7 @@ func _test_power_and_battery_physics() -> bool:
 	if battery.battery_capacity_wh <= 0.0:
 		push_error("FAIL: Battery capacity must be > 0 Wh.")
 		return false
-	print("  ✓ Battery correctly stores energy (%.0f Wh) with 0.0W active generation." % battery.battery_capacity_wh)
+	print("  [OK] Battery correctly stores energy (%.0f Wh) with 0.0W active generation." % battery.battery_capacity_wh)
 
 	# RTG must align with Perseverance MMRTG baseline (110W electrical, 2000W thermal)
 	if abs(rtg.power_generation - 110.0) > 1.0:
@@ -105,7 +105,7 @@ func _test_power_and_battery_physics() -> bool:
 	if abs(rtg.thermal_output_w - 2000.0) > 1.0:
 		push_error("FAIL: RTG thermal output must be ~2000W, got %.1f" % rtg.thermal_output_w)
 		return false
-	print("  ✓ MMRTG specifications verified: %.0fW electrical, %.0fW thermal." % [
+	print("  [OK] MMRTG specifications verified: %.0fW electrical, %.0fW thermal." % [
 		rtg.power_generation, rtg.thermal_output_w
 	])
 
@@ -116,7 +116,7 @@ func _test_power_and_battery_physics() -> bool:
 	sc.recalculate()
 	
 	var summary = ResourceCalculator.calculate_summary(sc)
-	print("  ✓ Battery runtime in darkness: %.1f hours at %.0fW continuous load." % [
+	print("  [OK] Battery runtime in darkness: %.1f hours at %.0fW continuous load." % [
 		summary["battery_runtime_hours"], abs(summary["net_power"])
 	])
 	if summary["battery_runtime_hours"] <= 0.0 or summary["battery_runtime_hours"] > 100.0:
@@ -142,10 +142,10 @@ func _test_propulsion_tsiolkovsky() -> bool:
 	var expected_isp = 325.0
 	var expected_dv = expected_isp * 9.80665 * log(expected_m0 / expected_mf) # ~2370 m/s
 
-	print("  ✓ Wet Mass: %.1f kg, Dry Mass: %.1f kg, Propellant: %.1f kg" % [
+	print("  [OK] Wet Mass: %.1f kg, Dry Mass: %.1f kg, Propellant: %.1f kg" % [
 		sc.total_mass, sc.dry_mass, sc.total_propellant_mass
 	])
-	print("  ✓ Calculated Delta-V: %.1f m/s (Theoretical Tsiolkovsky: %.1f m/s)" % [
+	print("  [OK] Calculated Delta-V: %.1f m/s (Theoretical Tsiolkovsky: %.1f m/s)" % [
 		sc.total_delta_v, expected_dv
 	])
 
@@ -166,7 +166,7 @@ func _test_validation_engine_constraints() -> bool:
 	if res_empty.is_valid:
 		push_error("FAIL: Empty spacecraft passed validation.")
 		return false
-	print("  ✓ Empty spacecraft correctly rejected with %d Hard Constraint error(s)." % res_empty.errors.size())
+	print("  [OK] Empty spacecraft correctly rejected with %d Hard Constraint error(s)." % res_empty.errors.size())
 
 	# Subtest B: Overweight craft fails launch booster Hard Constraint
 	var over_sc = SpacecraftConfig.new()
@@ -179,7 +179,7 @@ func _test_validation_engine_constraints() -> bool:
 	if res_over.is_valid or res_over.errors.is_empty():
 		push_error("FAIL: Overweight craft passed.")
 		return false
-	print("  ✓ Overweight payload correctly blocked: '%s'" % res_over.errors[0])
+	print("  [OK] Overweight payload correctly blocked: '%s'" % res_over.errors[0])
 
 	# Subtest C: Power deficit with battery creates SOFT warning, not launch blocker
 	var duty_sc = SpacecraftConfig.new()
@@ -195,7 +195,7 @@ func _test_validation_engine_constraints() -> bool:
 	if not res_duty.is_valid:
 		push_error("FAIL: Spacecraft with battery buffer was blocked for power duty-cycling: " + str(res_duty.errors))
 		return false
-	print("  ✓ Duty-cycled spacecraft passed with Soft Warnings (%d warnings, %d tips)." % [
+	print("  [OK] Duty-cycled spacecraft passed with Soft Warnings (%d warnings, %d tips)." % [
 		res_duty.warnings.size(), res_duty.tips.size()
 	])
 
@@ -222,7 +222,7 @@ func _test_simulation_state_machine_and_decisions() -> bool:
 	if engine.current_state != SimulationEngine.SimState.RUNNING:
 		push_error("FAIL: State was not RUNNING after start.")
 		return false
-	print("  ✓ State Machine: Initialized in RUNNING state.")
+	print("  [OK] State Machine: Initialized in RUNNING state.")
 
 	# Verify pause & resume
 	engine.pause_simulation()
@@ -233,7 +233,7 @@ func _test_simulation_state_machine_and_decisions() -> bool:
 	if engine.current_state != SimulationEngine.SimState.RUNNING:
 		push_error("FAIL: State was not RUNNING after resume.")
 		return false
-	print("  ✓ State Machine: PAUSE and RESUME transitions nominal.")
+	print("  [OK] State Machine: PAUSE and RESUME transitions nominal.")
 
 	# Verify decision requested transition to AWAITING_DECISION
 	var received_decision = false
@@ -244,14 +244,14 @@ func _test_simulation_state_machine_and_decisions() -> bool:
 	if engine.current_state != SimulationEngine.SimState.AWAITING_DECISION:
 		push_error("FAIL: State did not transition to AWAITING_DECISION.")
 		return false
-	print("  ✓ State Machine: AWAITING_DECISION triggered successfully.")
+	print("  [OK] State Machine: AWAITING_DECISION triggered successfully.")
 
 	# Verify decision submission resumes RUNNING
 	engine.submit_decision(1) # Core instrument priority
 	if engine.current_state != SimulationEngine.SimState.RUNNING:
 		push_error("FAIL: State did not resume to RUNNING after decision submission.")
 		return false
-	print("  ✓ State Machine: Interactive decision resolved and resumed RUNNING.")
+	print("  [OK] State Machine: Interactive decision resolved and resumed RUNNING.")
 
 	# Verify duplicate completion guard
 	engine._complete_simulation()
@@ -260,7 +260,7 @@ func _test_simulation_state_machine_and_decisions() -> bool:
 	if engine.current_state != first_state:
 		push_error("FAIL: Duplicate completion altered state.")
 		return false
-	print("  ✓ State Machine: Duplicate completion guard successfully protected lifecycle.")
+	print("  [OK] State Machine: Duplicate completion guard successfully protected lifecycle.")
 
 	engine.queue_free()
 	return true
@@ -286,7 +286,7 @@ func _test_data_pipeline_and_buffers() -> bool:
 	engine.storage_capacity_mb = 100.0 # Force small buffer to test overflow
 	engine._update_telemetry(2.0)
 
-	print("  ✓ Data Generated: %.1f MB | Buffered: %.1f MB | Dropped: %.1f MB" % [
+	print("  [OK] Data Generated: %.1f MB | Buffered: %.1f MB | Dropped: %.1f MB" % [
 		engine.data_collected_mb, engine.data_buffered_mb, engine.data_dropped_mb
 	])
 
@@ -320,15 +320,15 @@ func _test_mpi_scoring_engine() -> bool:
 
 	var result = ScoringEngine.calculate_score(sc, earth_m, 6, 6, 350.0, 300.0, mock_events)
 
-	print("  ✓ Mission Performance Index (MPI): %.1f / 100" % result.final_score)
+	print("  [OK] Mission Performance Index (MPI): %.1f / 100" % result.final_score)
 	print("    • Science Sub-Index (30%%): %.1f" % result.scientific_score)
 	print("    • Reliability Sub-Index (25%%): %.1f" % result.reliability_score)
 	print("    • Resource Efficiency (20%%): %.1f" % result.efficiency_score)
 	print("    • Budget Performance (15%%): %.1f" % result.budget_score)
 	print("    • Completion Score (10%%): %.1f" % result.completion_score)
-	print("  ✓ Engineering Strengths Identified: %d" % result.strengths.size())
-	print("  ✓ Engineering Recommendations: %d" % result.recommendations.size())
-	print("  ✓ NASA Educational Takeaways: %d" % result.educational_takeaways.size())
+	print("  [OK] Engineering Strengths Identified: %d" % result.strengths.size())
+	print("  [OK] Engineering Recommendations: %d" % result.recommendations.size())
+	print("  [OK] NASA Educational Takeaways: %d" % result.educational_takeaways.size())
 
 	if result.final_score < 70.0 or result.final_score > 100.0:
 		push_error("FAIL: Expected score in 70-100 range, got %.1f" % result.final_score)
@@ -358,7 +358,7 @@ func _test_planetary_mission_profiles() -> bool:
 	if not res_earth.is_valid:
 		push_error("FAIL: Earth spacecraft validation failed: " + str(res_earth.errors))
 		return false
-	print("  ✓ Earth TerraPulse-1 validated (Mass: %.0fkg, Delta-V: %.0fm/s)" % [
+	print("  [OK] Earth TerraPulse-1 validated (Mass: %.0fkg, Delta-V: %.0fm/s)" % [
 		earth_sc.total_mass, earth_sc.total_delta_v
 	])
 
@@ -378,7 +378,7 @@ func _test_planetary_mission_profiles() -> bool:
 	if not res_lunar.is_valid:
 		push_error("FAIL: Lunar configuration failed validation: " + str(res_lunar.errors))
 		return false
-	print("  ✓ Lunar Artemis Prospector validated (Mass: %.0fkg, Delta-V: %.0fm/s, Micro-Rover installed)" % [
+	print("  [OK] Lunar Artemis Prospector validated (Mass: %.0fkg, Delta-V: %.0fm/s, Micro-Rover installed)" % [
 		lunar_sc.total_mass, lunar_sc.total_delta_v
 	])
 
@@ -397,7 +397,7 @@ func _test_planetary_mission_profiles() -> bool:
 	if not res_mars.is_valid:
 		push_error("FAIL: Mars configuration failed validation: " + str(res_mars.errors))
 		return false
-	print("  ✓ Mars Ares Pathfinder Rover validated (Mass: %.0fkg, Cost: $%.1fM, Delta-V: %.0fm/s)" % [
+	print("  [OK] Mars Ares Pathfinder Rover validated (Mass: %.0fkg, Cost: $%.1fM, Delta-V: %.0fm/s)" % [
 		mars_sc.total_mass, mars_sc.total_cost, mars_sc.total_delta_v
 	])
 

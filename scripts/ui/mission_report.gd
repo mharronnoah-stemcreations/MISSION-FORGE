@@ -86,14 +86,14 @@ func _populate_report() -> void:
 	for child in list_strengths.get_children(): child.queue_free()
 	for s in result.strengths:
 		var l = Label.new()
-		l.text = "✓ " + s
+		l.text = "[+] " + s
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.add_theme_color_override("font_color", UITheme.COLOR_SUCCESS)
 		l.add_theme_font_size_override("font_size", 12)
 		list_strengths.add_child(l)
 	if result.strengths.is_empty():
 		var l = Label.new()
-		l.text = "• No significant engineering margins identified."
+		l.text = "- No significant engineering margins identified."
 		l.add_theme_color_override("font_color", UITheme.COLOR_TEXT_MUTED)
 		l.add_theme_font_size_override("font_size", 12)
 		list_strengths.add_child(l)
@@ -102,14 +102,14 @@ func _populate_report() -> void:
 	for child in list_weaknesses.get_children(): child.queue_free()
 	for w in result.weaknesses:
 		var l = Label.new()
-		l.text = "✗ " + w
+		l.text = "[-] " + w
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.add_theme_color_override("font_color", UITheme.COLOR_DANGER)
 		l.add_theme_font_size_override("font_size", 12)
 		list_weaknesses.add_child(l)
 	if result.weaknesses.is_empty():
 		var l = Label.new()
-		l.text = "• Flight executed within nominal constraints with zero anomalies."
+		l.text = "- Flight executed within nominal constraints with zero anomalies."
 		l.add_theme_color_override("font_color", UITheme.COLOR_TEXT_MUTED)
 		l.add_theme_font_size_override("font_size", 12)
 		list_weaknesses.add_child(l)
@@ -118,14 +118,14 @@ func _populate_report() -> void:
 	for child in list_recs.get_children(): child.queue_free()
 	for r in result.recommendations:
 		var l = Label.new()
-		l.text = "➜ " + r
+		l.text = "[->] " + r
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.add_theme_color_override("font_color", UITheme.COLOR_ACCENT_GOLD)
 		l.add_theme_font_size_override("font_size", 12)
 		list_recs.add_child(l)
 	if result.recommendations.is_empty():
 		var l = Label.new()
-		l.text = "• Vehicle design represents optimal systems trade-off for this flight profile."
+		l.text = "- Vehicle design represents optimal systems trade-off for this flight profile."
 		l.add_theme_color_override("font_color", UITheme.COLOR_TEXT_MUTED)
 		l.add_theme_font_size_override("font_size", 12)
 		list_recs.add_child(l)
@@ -134,7 +134,7 @@ func _populate_report() -> void:
 	for child in list_takeaways.get_children(): child.queue_free()
 	for t in result.educational_takeaways:
 		var l = Label.new()
-		l.text = "★ " + t
+		l.text = "[*] " + t
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.add_theme_color_override("font_color", UITheme.COLOR_TEXT_WHITE)
 		l.add_theme_font_size_override("font_size", 12)

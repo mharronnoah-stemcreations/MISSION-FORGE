@@ -6,7 +6,7 @@ var SceneManager: Node
 
 func _init() -> void:
 	print("==================================================")
-	print("🔍  DEEP INSPECTION OF ALL MISSIONFORGE SCENES")
+	print("[MISSIONFORGE] DEEP INSPECTION OF ALL SCENES")
 	print("==================================================")
 
 	# Autoloads for standalone testing
@@ -30,7 +30,7 @@ func _init() -> void:
 	print("\n[SCENE 1] main_menu.tscn")
 	var menu = load("res://scenes/main/main_menu.tscn").instantiate()
 	root.add_child(menu)
-	print("  ✓ Main Menu loaded successfully. Buttons: Start, Records, Guide, Quit.")
+	print("  [OK] Main Menu loaded successfully. Buttons: Start, Records, Guide, Quit.")
 	menu.queue_free()
 
 	# 2. Mission Selection
@@ -40,7 +40,7 @@ func _init() -> void:
 	var sel_title = sel.get_node("UI/PanelRight/VBox/LblMissionName").text
 	var sel_budget = sel.get_node("UI/PanelRight/VBox/GridStats/ValBudget").text
 	var sel_challenges = sel.get_node("UI/PanelRight/VBox/ScrollChallenges/ListChallenges").get_child_count()
-	print("  ✓ Selected Mission: '%s', Budget: %s, Challenges: %d items" % [sel_title, sel_budget, sel_challenges])
+	print("  [OK] Selected Mission: '%s', Budget: %s, Challenges: %d items" % [sel_title, sel_budget, sel_challenges])
 	sel.queue_free()
 
 	# 3. Briefing
@@ -55,10 +55,10 @@ func _init() -> void:
 	var obj_count = brf.get_node("UI/PanelMain/VBox/HBoxTop/PanelObjectives/VBox/Scroll/ListObjectives").get_child_count()
 	var req_count = brf.get_node("UI/PanelMain/VBox/HBoxBottom/PanelRequired/VBox/Scroll/ListRequired").get_child_count()
 	var nasa_text = brf.get_node("UI/PanelMain/VBox/HBoxBottom/PanelNasa/VBox/RtxtNasa").text
-	print("  ✓ Briefing Title: '%s'" % brf_title)
-	print("  ✓ Objectives Count: %d" % obj_count)
-	print("  ✓ Mandatory Hardware Count: %d" % req_count)
-	print("  ✓ NASA Context Length: %d characters" % nasa_text.length())
+	print("  [OK] Briefing Title: '%s'" % brf_title)
+	print("  [OK] Objectives Count: %d" % obj_count)
+	print("  [OK] Mandatory Hardware Count: %d" % req_count)
+	print("  [OK] NASA Context Length: %d characters" % nasa_text.length())
 	if obj_count == 0 or req_count == 0 or nasa_text.is_empty():
 		push_error("FAIL: Briefing content is missing or empty!")
 		quit(1)
@@ -75,11 +75,11 @@ func _init() -> void:
 	var mass_val = des.get_node("VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters/LblMassVal").text
 	var cost_val = des.get_node("VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters/LblCostVal").text
 	var selected_count = des.get_node("VBoxMain/HBoxCenter/PanelRight/VBox/ScrollSelected/ListSelected").get_child_count()
-	print("  ✓ Hardware Catalog Component Cards: %d" % comp_count)
-	print("  ✓ Default Installed Components: %d" % selected_count)
-	print("  ✓ Validation Status: '%s'" % status_text)
-	print("  ✓ Initial Mass Meter: %s" % mass_val)
-	print("  ✓ Initial Cost Meter: %s" % cost_val)
+	print("  [OK] Hardware Catalog Component Cards: %d" % comp_count)
+	print("  [OK] Default Installed Components: %d" % selected_count)
+	print("  [OK] Validation Status: '%s'" % status_text)
+	print("  [OK] Initial Mass Meter: %s" % mass_val)
+	print("  [OK] Initial Cost Meter: %s" % cost_val)
 	if comp_count == 0:
 		push_error("FAIL: Hardware catalog is empty!")
 		quit(1)
@@ -91,7 +91,7 @@ func _init() -> void:
 	var sim = load("res://scenes/simulation/simulation_scene.tscn").instantiate()
 	root.add_child(sim)
 	var phase_text = sim.get_node("UI/PanelTop/HBox/LblPhase").text
-	print("  ✓ Simulation Initialized. Current Phase: '%s'" % phase_text)
+	print("  [OK] Simulation Initialized. Current Phase: '%s'" % phase_text)
 	sim.queue_free()
 
 	# 6. Mission Report
@@ -100,10 +100,10 @@ func _init() -> void:
 	root.add_child(rep)
 	var rep_title = rep.get_node("UI/PanelMain/VBox/Header/VBox/LblTitle").text
 	var score_val = rep.get_node("UI/PanelMain/VBox/Header/VBoxScore/LblFinalScore").text
-	print("  ✓ Report Title: '%s', Score: %s" % [rep_title, score_val])
+	print("  [OK] Report Title: '%s', Score: %s" % [rep_title, score_val])
 	rep.queue_free()
 
 	print("\n==================================================")
-	print("🎉 ALL 6 SCENES VERIFIED WITH 100% COMPLETE DATA")
+	print("ALL 6 SCENES VERIFIED WITH 100% COMPLETE DATA")
 	print("==================================================")
 	quit(0)

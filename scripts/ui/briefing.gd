@@ -60,7 +60,7 @@ func _populate_briefing() -> void:
 		child.queue_free()
 	for obj in mission.objectives:
 		var lbl = Label.new()
-		lbl.text = "✓ " + obj
+		lbl.text = "[+] " + obj
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		lbl.add_theme_color_override("font_color", UITheme.COLOR_TEXT_WHITE)
 		lbl.add_theme_font_size_override("font_size", 13)
@@ -72,7 +72,7 @@ func _populate_briefing() -> void:
 	for req_id in mission.required_components:
 		var comp = mm.get_component(req_id) if mm != null else null
 		var lbl = Label.new()
-		lbl.text = "★ " + (comp.display_name if comp != null else req_id)
+		lbl.text = "[REQ] " + (comp.display_name if comp != null else req_id)
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		lbl.add_theme_color_override("font_color", UITheme.COLOR_ACCENT_GOLD)
 		lbl.add_theme_font_size_override("font_size", 13)

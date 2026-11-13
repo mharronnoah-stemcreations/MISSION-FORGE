@@ -5,7 +5,7 @@ extends Node
 
 func _ready() -> void:
 	print("==================================================")
-	print("🛰️  MISSIONFORGE FULL RUNTIME SCENE VERIFICATION")
+	print("[MISSIONFORGE] FULL RUNTIME SCENE VERIFICATION")
 	print("==================================================")
 
 	var mm = get_node_or_null("/root/MissionManager")
@@ -35,10 +35,10 @@ func _ready() -> void:
 	var req_list = brf_scene.get_node("UI/PanelMain/VBox/HBoxBottom/PanelRequired/VBox/Scroll/ListRequired")
 	var rtxt_nasa = brf_scene.get_node("UI/PanelMain/VBox/HBoxBottom/PanelNasa/VBox/RtxtNasa")
 	
-	print("  ✓ Mission Title: ", brf_title)
-	print("  ✓ Primary Objectives Listed: ", obj_list.get_child_count())
-	print("  ✓ Mandatory Hardware Items: ", req_list.get_child_count())
-	print("  ✓ NASA Reference & Heritage Length: ", rtxt_nasa.text.length(), " chars")
+	print("  [OK] Mission Title: ", brf_title)
+	print("  [OK] Primary Objectives Listed: ", obj_list.get_child_count())
+	print("  [OK] Mandatory Hardware Items: ", req_list.get_child_count())
+	print("  [OK] NASA Reference & Heritage Length: ", rtxt_nasa.text.length(), " chars")
 	
 	for i in range(obj_list.get_child_count()):
 		print("    - ", obj_list.get_child(i).text)
@@ -64,12 +64,12 @@ func _ready() -> void:
 	var cost_lbl = des_scene.get_node("VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters/LblCostVal")
 	var power_lbl = des_scene.get_node("VBoxMain/HBoxCenter/PanelRight/VBox/GridMeters/LblPowerVal")
 	
-	print("  ✓ Hardware Catalog Cards Displayed: ", list_comps.get_child_count())
-	print("  ✓ Initially Installed Components: ", list_selected.get_child_count())
-	print("  ✓ Launch Validation Status: ", status_lbl.text)
-	print("  ✓ Initial Mass: ", mass_lbl.text)
-	print("  ✓ Initial Cost: ", cost_lbl.text)
-	print("  ✓ Initial Power Balance: ", power_lbl.text)
+	print("  [OK] Hardware Catalog Cards Displayed: ", list_comps.get_child_count())
+	print("  [OK] Initially Installed Components: ", list_selected.get_child_count())
+	print("  [OK] Launch Validation Status: ", status_lbl.text)
+	print("  [OK] Initial Mass: ", mass_lbl.text)
+	print("  [OK] Initial Cost: ", cost_lbl.text)
+	print("  [OK] Initial Power Balance: ", power_lbl.text)
 	
 	# Sample first 3 components from catalog
 	for i in range(min(4, list_comps.get_child_count())):
@@ -94,13 +94,13 @@ func _ready() -> void:
 	add_child(sim_scene)
 	
 	var engine = sim_scene.get_node("SimulationEngine")
-	print("  ✓ Simulation Engine started. Speeding up to test all 6 phases...")
+	print("  [OK] Simulation Engine started. Speeding up to test all 6 phases...")
 	engine.set_speed(8.0)
 	
 	# Skip to end or let it advance
 	engine.skip_to_end()
 	
-	print("  ✓ Simulation Completed! Final Result Produced:")
+	print("  [OK] Simulation Completed! Final Result Produced:")
 	print("    • Destination: ", gm.current_result.destination)
 	print("    • Score: ", gm.current_result.final_score)
 	print("    • Events Logged: ", gm.current_result.events.size())
@@ -116,12 +116,12 @@ func _ready() -> void:
 	
 	var rep_score = rep_scene.get_node("UI/PanelMain/VBox/Header/VBoxScore/LblFinalScore").text
 	var rep_rating = rep_scene.get_node("UI/PanelMain/VBox/Header/VBox/LblRating").text
-	print("  ✓ Mission Report Displaying Final Score: ", rep_score)
-	print("  ✓ Rating Badge: ", rep_rating)
+	print("  [OK] Mission Report Displaying Final Score: ", rep_score)
+	print("  [OK] Rating Badge: ", rep_rating)
 	rep_scene.queue_free()
 
 	print("\n==================================================")
-	print("🎉 SUCCESS: BOTH BRIEFING AND HARDWARE CATALOG ARE")
+	print("SUCCESS: BOTH BRIEFING AND HARDWARE CATALOG ARE")
 	print("   FULLY POPULATED WITH 24 AEROSPACE HARDWARE CARDS")
 	print("   AND AUTHENTIC NASA MISSION OBJECTIVES!")
 	print("==================================================")

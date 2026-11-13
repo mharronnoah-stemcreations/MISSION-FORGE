@@ -185,7 +185,7 @@ func _create_component_item_card(comp: SpaceComponent) -> Control:
 	lbl_name.add_theme_font_size_override("font_size", 13)
 
 	var btn_inspect = Button.new()
-	btn_inspect.text = "🔍 FOCUS"
+	btn_inspect.text = "FOCUS"
 	btn_inspect.tooltip_text = "Highlight & inspect component in 3D viewport"
 	btn_inspect.custom_minimum_size = Vector2(70, 26)
 	UITheme.style_button(btn_inspect, false)
@@ -248,7 +248,7 @@ func _create_component_item_card(comp: SpaceComponent) -> Control:
 
 	if not comp.nasa_heritage.is_empty():
 		var lbl_heritage = Label.new()
-		lbl_heritage.text = "🏛️ NASA Heritage: " + comp.nasa_heritage
+		lbl_heritage.text = "NASA Heritage: " + comp.nasa_heritage
 		lbl_heritage.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		lbl_heritage.add_theme_color_override("font_color", UITheme.COLOR_ACCENT_CYAN)
 		lbl_heritage.add_theme_font_size_override("font_size", 10)
@@ -352,7 +352,7 @@ func _update_all() -> void:
 		)
 
 		var b = Button.new()
-		b.text = "✕"
+		b.text = "X"
 		b.custom_minimum_size = Vector2(24, 20)
 		UITheme.style_button(b, false)
 		b.pressed.connect(func():
@@ -382,7 +382,7 @@ func _update_all() -> void:
 
 	for err in _last_validation.errors:
 		var lbl = Label.new()
-		lbl.text = "❌ " + err
+		lbl.text = "[ERROR] " + err
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		lbl.add_theme_color_override("font_color", UITheme.COLOR_DANGER)
 		lbl.add_theme_font_size_override("font_size", 11)
@@ -390,7 +390,7 @@ func _update_all() -> void:
 
 	for warn in _last_validation.warnings:
 		var lbl = Label.new()
-		lbl.text = "⚠️ " + warn
+		lbl.text = "[WARN] " + warn
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		lbl.add_theme_color_override("font_color", UITheme.COLOR_WARNING)
 		lbl.add_theme_font_size_override("font_size", 11)
@@ -398,7 +398,7 @@ func _update_all() -> void:
 
 	for tip in _last_validation.tips:
 		var lbl = Label.new()
-		lbl.text = "💡 " + tip
+		lbl.text = "[TIP] " + tip
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		lbl.add_theme_color_override("font_color", UITheme.COLOR_ACCENT_CYAN)
 		lbl.add_theme_font_size_override("font_size", 11)
@@ -428,7 +428,7 @@ func _on_exploded_pressed() -> void:
 	if preview_3d == null:
 		return
 	var is_exp = preview_3d.toggle_exploded_view()
-	btn_exploded.text = "⚡ COMPACT VIEW" if is_exp else "⚡ EXPLODED VIEW"
+	btn_exploded.text = "COMPACT VIEW" if is_exp else "EXPLODED VIEW"
 	lbl_view_status.text = "CAD VIEW: EXPLODED SCHEMATIC" if is_exp else "CAD VIEW: ASSEMBLED"
 	UITheme.style_button(btn_exploded, is_exp)
 
@@ -476,7 +476,7 @@ func _show_component_inspection(comp: SpaceComponent) -> void:
 	lbl_inspect_desc.text = comp.description
 	if not comp.nasa_heritage.is_empty():
 		lbl_inspect_heritage.visible = true
-		lbl_inspect_heritage.text = "🏛️ NASA Heritage: " + comp.nasa_heritage
+		lbl_inspect_heritage.text = "NASA Heritage: " + comp.nasa_heritage
 	else:
 		lbl_inspect_heritage.visible = false
 
