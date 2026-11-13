@@ -1,13 +1,14 @@
-[gd_scene load_steps=5 format=3 uid="uid://b2m3s4k5l6m7n"]
+[gd_scene load_steps=6 format=3 uid="uid://b2m3s4k5l6m7n"]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="Script" path="res://scripts/visuals/planet_visualizer.gd" id="2_planet"]
+[ext_resource type="FontFile" uid="uid://c8fontagencyb01" path="res://assets/fonts/agency_bold.ttf" id="3_font"]
 
 [sub_resource type="Environment" id="Environment_1"]
 background_mode = 1
-background_color = Color(0.015, 0.025, 0.045, 1)
+background_color = Color(0.008, 0.012, 0.022, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.15, 0.2, 0.3, 1)
+ambient_light_color = Color(0.18, 0.22, 0.32, 1)
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -73,8 +74,13 @@ theme_override_constants/separation = 6
 [node name="LabelTitle" type="Label" parent="UI/VBoxHeader"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.9, 1, 1)
-theme_override_font_sizes/font_size = 52
-text = "MISSIONFORGE"
+theme_override_colors/font_shadow_color = Color(0, 0.45, 0.8, 0.5)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_constants/shadow_outline_size = 6
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 64
+text = "MISSION FORGE"
 
 [node name="LabelSubtitle" type="Label" parent="UI/VBoxHeader"]
 layout_mode = 2
@@ -135,7 +141,7 @@ grow_vertical = 0
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.55, 0.68, 1)
 theme_override_font_sizes/font_size = 12
-text = "MISSIONFORGE v2.0 | Developed for NASA Space Apps Challenge 2026 | Engine: Godot 4.x"
+text = "MISSION FORGE v2.0 | Developed for NASA Space Apps Challenge 2026 | Engine: Godot 4.x"
 
 [node name="Modals" type="Control" parent="."]
 layout_mode = 1

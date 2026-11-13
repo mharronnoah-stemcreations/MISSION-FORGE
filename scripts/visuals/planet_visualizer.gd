@@ -1,6 +1,8 @@
 class_name PlanetVisualizer
 extends Node3D
 
+const StarfieldClass = preload("res://scripts/visuals/starfield.gd")
+
 # PlanetVisualizer
 # High-fidelity procedural planetary visualization system for MissionForge.
 # Creates distinct aerospace environments for NASA targets:
@@ -72,6 +74,9 @@ func _rebuild_planet() -> void:
 	_swath_cone_instance = null
 	_surface_terrain_node = null
 	_surface_rover_node = null
+
+	var sf = StarfieldClass.new()
+	add_child(sf)
 
 	_planet_mesh_instance = MeshInstance3D.new()
 	var sphere = SphereMesh.new()
