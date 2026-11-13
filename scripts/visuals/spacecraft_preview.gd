@@ -477,6 +477,26 @@ func _create_suspension_strut(from_pos: Vector3, to_pos: Vector3, mat: Material)
 	strut.material_override = mat
 	mount.add_child(strut)
 
+func _create_arm_tube(parent: Node3D, from_pos: Vector3, to_pos: Vector3, radius: float, mat: Material) -> void:
+	var mount = Node3D.new()
+	parent.add_child(mount)
+	var dir = (to_pos - from_pos).normalized()
+	if dir.length_squared() > 0.001:
+		var up = Vector3.UP if abs(dir.y) < 0.99 else Vector3.FORWARD
+		mount.transform = Transform3D().looking_at(dir, up)
+	mount.position = from_pos
+	var dist = from_pos.distance_to(to_pos)
+	var tube = MeshInstance3D.new()
+	var cyl = CylinderMesh.new()
+	cyl.top_radius = radius
+	cyl.bottom_radius = radius
+	cyl.height = dist
+	tube.mesh = cyl
+	tube.position = Vector3(0.0, 0.0, -dist * 0.5)
+	tube.rotation.x = PI / 2.0
+	tube.material_override = mat
+	mount.add_child(tube)
+
 func _build_dual_solar_wings(comp_id: String) -> void:
 	var compact_pos = Vector3.ZERO
 	var exploded_offset = Vector3(0.0, 0.4, 0.0)
@@ -909,63 +929,235 @@ func _build_sar_radar_panel(comp_id: String) -> void:
 	wrapper.add_child(radar)
 
 func _build_drill_arm(comp_id: String) -> void:
-	var compact_pos = Vector3(0.35, -0.25, 0.55)
-	var exploded_offset = Vector3(0.9, -0.2, 1.2)
-	var arm_rot_x = PI / 4.0
+	var compact_pos = Vector3(0.45, -0.12, 0.32)
+	var exploded_offset = Vector3(0.8, -0.2, 0.8)
 
 	if current_structure == StructureType.ROVER:
-		# Front robotic arm mounted to front-starboard nose
-		compact_pos = Vector3(0.24, 0.22, 0.67)
-		exploded_offset = Vector3(0.8, -0.1, 1.2)
-		arm_rot_x = PI / 3.0
+		# Front-port deck mounting anchored flush to rover equipment plate
+		compact_pos = Vector3(-0.25, 0.445, 0.50)
+		exploded_offset = Vector3(-0.7, 0.5, 0.8)
 	elif current_structure == StructureType.DEEP_SPACE:
-		compact_pos = Vector3(0.38, -0.25, 0.60)
-		exploded_offset = Vector3(1.0, -0.2, 1.2)
+		compact_pos = Vector3(0.54, -0.12, 0.32)
+		exploded_offset = Vector3(1.0, -0.2, 0.8)
 
 	var wrapper = _create_wrapper(comp_id, compact_pos, exploded_offset)
 
-	# Shoulder joint mount
-	var shoulder = MeshInstance3D.new()
-	var s_sp = SphereMesh.new()
-	s_sp.radius = 0.065
-	s_sp.height = 0.13
-	shoulder.mesh = s_sp
-	var s_mat = StandardMaterial3D.new()
-	s_mat.albedo_color = Color(0.3, 0.32, 0.35)
-	s_mat.metallic = 0.92
-	shoulder.material_override = s_mat
-	wrapper.add_child(shoulder)
+	# Common materials
+	var struct_mat = StandardMaterial3D.new()
+	struct_mat.albedo_color = Color(0.28, 0.30, 0.34) # Anodized aerospace titanium
+	struct_mat.metallic = 0.92
+	struct_mat.roughness = 0.25
 
-	# Main arm
-	var arm = MeshInstance3D.new()
-	var cyl = CylinderMesh.new()
-	cyl.top_radius = 0.035
-	cyl.bottom_radius = 0.035
-	cyl.height = 0.58
-	arm.mesh = cyl
-	arm.position = Vector3(0.0, -0.18, 0.18)
-	arm.rotation.x = arm_rot_x
-	var mat = StandardMaterial3D.new()
-	mat.albedo_color = Color(0.4, 0.42, 0.45)
-	mat.metallic = 0.92
-	arm.material_override = mat
-	wrapper.add_child(arm)
+	var joint_mat = StandardMaterial3D.new()
+	joint_mat.albedo_color = Color(0.18, 0.19, 0.22) # High-torque graphite servo casing
+	joint_mat.metallic = 0.85
+	joint_mat.roughness = 0.35
 
-	# Drill tool bit at end
-	var drill = MeshInstance3D.new()
-	var d_cone = CylinderMesh.new()
-	d_cone.top_radius = 0.01
-	d_cone.bottom_radius = 0.04
-	d_cone.height = 0.14
-	drill.mesh = d_cone
-	drill.position = Vector3(0.0, -0.38, 0.38)
-	drill.rotation.x = arm_rot_x
-	var d_mat = StandardMaterial3D.new()
-	d_mat.albedo_color = Color(0.85, 0.88, 0.92) # Polished tungsten carbide
-	d_mat.metallic = 0.98
-	d_mat.roughness = 0.15
-	drill.material_override = d_mat
-	wrapper.add_child(drill)
+	var gold_mat = StandardMaterial3D.new()
+	gold_mat.albedo_color = Color(0.92, 0.78, 0.22) # Gold MLI thermal foil
+	gold_mat.metallic = 0.92
+	gold_mat.roughness = 0.16
+
+	var carbide_mat = StandardMaterial3D.new()
+	carbide_mat.albedo_color = Color(0.92, 0.94, 0.97) # Polished tungsten carbide
+	carbide_mat.metallic = 0.98
+	carbide_mat.roughness = 0.12
+
+	var steel_mat = StandardMaterial3D.new()
+	steel_mat.albedo_color = Color(0.70, 0.73, 0.78) # Machined stainless steel
+	steel_mat.metallic = 0.94
+	steel_mat.roughness = 0.18
+
+	if current_structure == StructureType.ROVER:
+		# 1. Deck structural mounting flange bolted to top deck plate
+		var flange = MeshInstance3D.new()
+		var fl_box = BoxMesh.new()
+		fl_box.size = Vector3(0.14, 0.018, 0.14)
+		flange.mesh = fl_box
+		flange.position = Vector3(0.0, 0.009, 0.0)
+		flange.material_override = struct_mat
+		wrapper.add_child(flange)
+
+		# 2. Azimuth turret pedestal (yaw axis actuator)
+		var pedestal = MeshInstance3D.new()
+		var p_cyl = CylinderMesh.new()
+		p_cyl.top_radius = 0.050
+		p_cyl.bottom_radius = 0.056
+		p_cyl.height = 0.075
+		pedestal.mesh = p_cyl
+		pedestal.position = Vector3(0.0, 0.055, 0.0)
+		pedestal.material_override = joint_mat
+		wrapper.add_child(pedestal)
+
+		# 3. Shoulder pitch elevation joint
+		var p_shoulder = Vector3(0.0, 0.11, 0.0)
+		var shoulder = MeshInstance3D.new()
+		var s_sph = SphereMesh.new()
+		s_sph.radius = 0.046
+		s_sph.height = 0.092
+		shoulder.mesh = s_sph
+		shoulder.position = p_shoulder
+		shoulder.material_override = joint_mat
+		wrapper.add_child(shoulder)
+
+		# 4. Upper Arm (Bicep tube) extending forward & down
+		var p_elbow = Vector3(0.02, 0.04, 0.28)
+		_create_arm_tube(wrapper, p_shoulder, p_elbow, 0.026, struct_mat)
+
+		# 5. Elbow pitch actuator
+		var elbow = MeshInstance3D.new()
+		var e_cyl = CylinderMesh.new()
+		e_cyl.top_radius = 0.040
+		e_cyl.bottom_radius = 0.040
+		e_cyl.height = 0.075
+		elbow.mesh = e_cyl
+		elbow.position = p_elbow
+		elbow.rotation.z = PI / 2.0
+		elbow.material_override = joint_mat
+		wrapper.add_child(elbow)
+
+		# 6. Forearm tube extending down towards front sampling envelope
+		var p_wrist = Vector3(0.02, -0.22, 0.46)
+		_create_arm_tube(wrapper, p_elbow, p_wrist, 0.022, struct_mat)
+
+		# 7. Wrist 2-axis gimbal joint
+		var wrist = MeshInstance3D.new()
+		var w_sph = SphereMesh.new()
+		w_sph.radius = 0.038
+		w_sph.height = 0.076
+		wrist.mesh = w_sph
+		wrist.position = p_wrist
+		wrist.material_override = joint_mat
+		wrapper.add_child(wrist)
+
+		# 8. Percussive Coring Drill Turret Head
+		var turret = Node3D.new()
+		turret.position = Vector3(0.02, -0.26, 0.48)
+		wrapper.add_child(turret)
+
+		# Turret main gearbox (Gold MLI thermal insulation)
+		var gearbox = MeshInstance3D.new()
+		var g_box = BoxMesh.new()
+		g_box.size = Vector3(0.12, 0.13, 0.13)
+		gearbox.mesh = g_box
+		gearbox.material_override = gold_mat
+		turret.add_child(gearbox)
+
+		# ChemCam / SuperCam LIBS laser pod & optics window
+		var laser_tube = MeshInstance3D.new()
+		var l_cyl = CylinderMesh.new()
+		l_cyl.top_radius = 0.018
+		l_cyl.bottom_radius = 0.018
+		l_cyl.height = 0.06
+		laser_tube.mesh = l_cyl
+		laser_tube.rotation.x = PI / 4.0
+		laser_tube.position = Vector3(0.0, 0.065, 0.05)
+		laser_tube.material_override = steel_mat
+		turret.add_child(laser_tube)
+
+		var ruby_lens = MeshInstance3D.new()
+		var r_cyl = CylinderMesh.new()
+		r_cyl.top_radius = 0.014
+		r_cyl.bottom_radius = 0.014
+		r_cyl.height = 0.01
+		ruby_lens.mesh = r_cyl
+		ruby_lens.rotation.x = PI / 4.0
+		ruby_lens.position = Vector3(0.0, 0.088, 0.072)
+		var ruby_mat = StandardMaterial3D.new()
+		ruby_mat.albedo_color = Color(0.95, 0.12, 0.18)
+		ruby_mat.emission_enabled = true
+		ruby_mat.emission = Color(0.85, 0.08, 0.12)
+		ruby_lens.material_override = ruby_mat
+		turret.add_child(ruby_lens)
+
+		# Rotary-percussive drill chuck & motor spindle
+		var chuck = MeshInstance3D.new()
+		var c_cyl = CylinderMesh.new()
+		c_cyl.top_radius = 0.032
+		c_cyl.bottom_radius = 0.028
+		c_cyl.height = 0.06
+		chuck.mesh = c_cyl
+		chuck.position = Vector3(0.0, -0.09, 0.0)
+		chuck.material_override = steel_mat
+		turret.add_child(chuck)
+
+		# Hollow coring drill bit pointing downward
+		var bit = MeshInstance3D.new()
+		var b_cyl = CylinderMesh.new()
+		b_cyl.top_radius = 0.013
+		b_cyl.bottom_radius = 0.009
+		b_cyl.height = 0.17
+		bit.mesh = b_cyl
+		bit.position = Vector3(0.0, -0.19, 0.0)
+		bit.material_override = carbide_mat
+		turret.add_child(bit)
+
+		# Dual rock contact stabilizer tines
+		for side in [-1.0, 1.0]:
+			var tine = MeshInstance3D.new()
+			var t_cyl = CylinderMesh.new()
+			t_cyl.top_radius = 0.005
+			t_cyl.bottom_radius = 0.005
+			t_cyl.height = 0.15
+			tine.mesh = t_cyl
+			tine.position = Vector3(side * 0.036, -0.16, 0.0)
+			tine.material_override = steel_mat
+			turret.add_child(tine)
+
+		# Sample caching tube carousel / transfer port
+		var carousel = MeshInstance3D.new()
+		var car_cyl = CylinderMesh.new()
+		car_cyl.top_radius = 0.025
+		car_cyl.bottom_radius = 0.025
+		car_cyl.height = 0.06
+		carousel.mesh = car_cyl
+		carousel.rotation.z = PI / 2.0
+		carousel.position = Vector3(0.068, 0.0, 0.0)
+		carousel.material_override = steel_mat
+		turret.add_child(carousel)
+	else:
+		# Spacecraft / Probe bus: side-hull mounting plate with deployable sampling arm
+		var wall_bracket = MeshInstance3D.new()
+		var brk_box = BoxMesh.new()
+		brk_box.size = Vector3(0.02, 0.16, 0.16)
+		wall_bracket.mesh = brk_box
+		wall_bracket.position = Vector3(-0.01, 0.0, 0.0)
+		wall_bracket.material_override = struct_mat
+		wrapper.add_child(wall_bracket)
+
+		var hinge = MeshInstance3D.new()
+		var h_cyl = CylinderMesh.new()
+		h_cyl.top_radius = 0.04
+		h_cyl.bottom_radius = 0.04
+		h_cyl.height = 0.08
+		hinge.mesh = h_cyl
+		hinge.position = Vector3(0.03, 0.0, 0.0)
+		hinge.material_override = joint_mat
+		wrapper.add_child(hinge)
+
+		# Deployable sampling boom
+		var p_end = Vector3(0.18, -0.22, 0.32)
+		_create_arm_tube(wrapper, Vector3(0.03, 0.0, 0.0), p_end, 0.026, struct_mat)
+
+		# Regolith coring & volatile sampling head
+		var head = MeshInstance3D.new()
+		var head_box = BoxMesh.new()
+		head_box.size = Vector3(0.12, 0.12, 0.14)
+		head.mesh = head_box
+		head.position = p_end
+		head.material_override = gold_mat
+		wrapper.add_child(head)
+
+		# Coring bit
+		var drill_bit = MeshInstance3D.new()
+		var d_cone = CylinderMesh.new()
+		d_cone.top_radius = 0.008
+		d_cone.bottom_radius = 0.025
+		d_cone.height = 0.16
+		drill_bit.mesh = d_cone
+		drill_bit.position = p_end + Vector3(0.0, -0.12, 0.0)
+		drill_bit.material_override = carbide_mat
+		wrapper.add_child(drill_bit)
 
 func _build_seismometer(comp_id: String) -> void:
 	var compact_pos = Vector3(-0.35, 0.46, 0.2)
