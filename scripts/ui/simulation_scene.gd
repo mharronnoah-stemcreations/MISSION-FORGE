@@ -679,7 +679,6 @@ func _on_telemetry_updated(telemetry: Dictionary) -> void:
 	var d_col = telemetry.get("data_collected", 0.0)
 	var d_down = telemetry.get("data_downlinked", 0.0)
 	var d_buf = telemetry.get("data_buffered", 0.0)
-	var gm = _gm()
 	var buf_cap_mb = 500.0
 	if gm != null and gm.current_spacecraft != null:
 		buf_cap_mb = max(50.0, gm.current_spacecraft.total_storage_capacity_gb * 1000.0)
