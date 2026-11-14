@@ -11,7 +11,7 @@
 ## ⚡ Quick Start & How to Play
 
 ### Option 1: Direct Play (Windows Standalone)
-1. Download or extract `MF ver. 1.0.0.zip` (available in the root repository or under [Releases](https://github.com/mharronnoah-stemcreations/MISSION-FORGE/releases)).
+1. Download or extract `MF ver. 1.0.0 (Windows Build).zip` (available in the root repository or under [Releases](https://github.com/mharronnoah-stemcreations/MISSION-FORGE/releases)).
 2. Extract the archive contents into a folder.
 3. Launch `MISSION_FORGE.exe` to start the game directly. No engine installation required!
 
