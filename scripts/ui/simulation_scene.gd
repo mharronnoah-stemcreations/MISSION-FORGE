@@ -188,16 +188,29 @@ func _ready() -> void:
 	_lbl_free_hint.name = "LblFreeHint"
 	_lbl_free_hint.text = "[FREE CAM ACTIVE] LMB: Orbit | RMB / WASD: Pan | Wheel: Zoom | R: Reset Focus"
 	_lbl_free_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_lbl_free_hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_lbl_free_hint.add_theme_color_override("font_color", UITheme.COLOR_ACCENT_CYAN)
 	_lbl_free_hint.add_theme_font_size_override("font_size", 12)
-	_lbl_free_hint.anchor_left = 0.0
-	_lbl_free_hint.anchor_right = 1.0
+
+	var free_hint_bg = StyleBoxFlat.new()
+	free_hint_bg.bg_color = Color(0.02, 0.06, 0.12, 0.82)
+	free_hint_bg.border_color = Color(0.0, 0.85, 1.0, 0.50)
+	free_hint_bg.set_border_width_all(1)
+	free_hint_bg.set_corner_radius_all(4)
+	free_hint_bg.content_margin_left = 14.0
+	free_hint_bg.content_margin_right = 14.0
+	free_hint_bg.content_margin_top = 4.0
+	free_hint_bg.content_margin_bottom = 4.0
+	_lbl_free_hint.add_theme_stylebox_override("normal", free_hint_bg)
+
+	_lbl_free_hint.anchor_left = 0.5
+	_lbl_free_hint.anchor_right = 0.5
 	_lbl_free_hint.anchor_top = 1.0
 	_lbl_free_hint.anchor_bottom = 1.0
-	_lbl_free_hint.offset_left = 0.0
-	_lbl_free_hint.offset_right = 0.0
-	_lbl_free_hint.offset_top = -66.0
-	_lbl_free_hint.offset_bottom = -46.0
+	_lbl_free_hint.offset_left = -320.0
+	_lbl_free_hint.offset_right = 320.0
+	_lbl_free_hint.offset_top = -102.0
+	_lbl_free_hint.offset_bottom = -72.0
 	_lbl_free_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_lbl_free_hint.visible = false
 	$UI.add_child(_lbl_free_hint)
