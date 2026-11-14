@@ -29,6 +29,11 @@
   "brief_overview": "Deliver a 6-wheeled robotic astrobiology rover to Jezero Crater, Mars (18.38°N, 77.58°E). Survive hypersonic atmospheric entry (EDL), deploy rocket Sky Crane terminal descent, and collect pristine rock core samples exploring an ancient river delta for fossil biosignatures.",
   "nasa_flight_parameters": {
     "target_landing_site": "Jezero Crater Delta Fan (18.38°N, 77.58°E)",
+    "orbital_altitude_km": 255.0,
+    "orbital_altitude_ratio": "255 km / 3,389.5 km radius (7.52% Mars radius altitude)",
+    "spacecraft_scale_nasa": "MRO: 3.0m bus, 13.6m solar span; Perseverance: 3.0m × 2.7m × 2.2m",
+    "sensor_alignment": "Nadir-pointing CRISM & HiRISE optical cameras; Surface Mastcam-Z stereo mast",
+    "nasa_heritage_reference": "NASA JPL Mars Reconnaissance Orbiter & Mars 2020 Perseverance Flight Operations",
     "entry_velocity_kmh": 20000.0,
     "one_way_light_time_minutes": "14.2 minutes (Autonomous EDL required)",
     "surface_solar_flux_percent": "43% of Earth solar irradiance",
@@ -46,7 +51,7 @@
     "Solar Distance & Dust: Mars receives less than 43% of Earth's solar irradiance. Dust accumulation on solar arrays drastically degrades power, making nuclear MMRTG systems essential for 24/7 science.",
     "Mass & Budget Limits: An interplanetary rover stack (aeroshell, parachute, sky crane, rover) requires strict mass control to fit within launch vehicle fairings."
   ],
-  "educational_context": "Jezero Crater was chosen for NASA's Mars 2020 mission because it hosted an ancient lake and river delta over 3.5 billion years ago. Clay minerals deposited in the delta preserve microscopic organic structures and biomarkers if microbial life ever arose on Mars. The Sky Crane maneuver allows heavy rovers to land directly on their wheels without ramps.",
+  "educational_context": "Jezero Crater was chosen for NASA's Mars 2020 mission because it hosted an ancient lake and river delta over 3.5 billion years ago. Clay minerals deposited in the delta preserve microscopic organic structures and biomarkers if microbial life ever arose on Mars. The Sky Crane maneuver allows heavy rovers to land directly on their wheels without ramps. In the orbital reconnaissance phase, NASA orbiters such as MRO circle Mars at 255 km altitude (7.52% of Mars' 3,389.5 km radius) in active nadir alignment to capture mineralogical maps and landing-zone topography.",
   "nasa_reference_title": "NASA Mars 2020 Perseverance Rover Mission",
   "nasa_reference_url": "https://mars.nasa.gov/mars2020/"
 }

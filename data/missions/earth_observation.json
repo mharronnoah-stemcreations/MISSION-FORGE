@@ -27,6 +27,10 @@
   "nasa_flight_parameters": {
     "orbit_type": "Sun-Synchronous Low Earth Orbit (SSO)",
     "altitude_km": 705.0,
+    "orbital_altitude_ratio": "705 km / 6,371 km radius (11.07% Earth radius altitude)",
+    "spacecraft_scale_nasa": "Landsat-9 / Terra: 3.1m × 2.4m bus, 10.2m solar array wingspan",
+    "camera_alignment": "Nadir-pointing (-Y optical aperture locked directly to Earth surface center)",
+    "nasa_heritage_reference": "NASA Landsat-9 OLI-2 / EOS Terra MODIS Flight Dynamics Specifications",
     "inclination_deg": 98.2,
     "orbital_period_minutes": 98.8,
     "eclipse_duration_minutes": 35.2,
@@ -43,7 +47,7 @@
     "Orbital Eclipse Cycles: Spacecraft spends ~35 minutes of every 99-minute orbit in Earth's shadow; Li-ion battery buffering is essential.",
     "High Data Rate: Optical pushbroom imagers and SAR sensors generate 250+ MB/day; onboard solid-state memory is required between ground passes."
   ],
-  "educational_context": "Earth observation satellites utilize Sun-synchronous orbits so they cross the equator at the same local solar time on every pass (typically 10:00 AM descending node), providing consistent shadow angles and lighting for multi-year environmental comparisons. NASA's Earth Observing System (EOS) operates satellites like Terra, Aqua, and Landsat to monitor planetary changes.",
+  "educational_context": "Earth observation satellites utilize Sun-synchronous orbits so they cross the equator at the same local solar time on every pass (typically 10:00 AM descending node), providing consistent shadow angles and lighting for multi-year environmental comparisons. NASA's Earth Observing System (EOS) operates satellites like Terra, Aqua, and Landsat to monitor planetary changes. According to NASA Landsat-9 and Terra flight dynamics specifications, spacecraft orbit at 705 km altitude (11.1% of Earth's 6,371 km radius) and maintain active 3-axis nadir pointing so their optical imaging sensors continuously face the Earth surface while solar wings articulate toward the Sun.",
   "nasa_reference_title": "NASA Earth Science & Landsat Program",
   "nasa_reference_url": "https://science.nasa.gov/earth-science/"
 }

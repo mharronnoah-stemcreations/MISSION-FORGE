@@ -157,28 +157,50 @@ func _setup_earth_environment(_sphere: SphereMesh) -> void:
 	_atmosphere_mesh_instance.material_override = atmo_mat
 	add_child(_atmosphere_mesh_instance)
 
-	# 705 km Sun-Synchronous Orbit Trajectory Ring
-	_setup_earth_orbit_ring()
+	# NASA Authentic 705 km Sun-Synchronous Orbit Trajectory Ring
+	_setup_orbit_ring("Earth")
 
-func _setup_earth_orbit_ring() -> void:
+func _setup_orbit_ring(type: String) -> void:
 	var ring_mesh = ImmediateMesh.new()
 	_orbit_ring_instance = MeshInstance3D.new()
 	_orbit_ring_instance.mesh = ring_mesh
 	var ring_mat = StandardMaterial3D.new()
 	ring_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	ring_mat.albedo_color = Color(0.0, 0.88, 1.0, 0.45)
+	
+	var r_orb = radius * (1.0 + 705.0 / 6371.0)
+	var inclination_factor_y = 0.95
+	var inclination_factor_z = 0.32
+
+	match type:
+		"Earth":
+			# NASA 705 km Sun-Synchronous Orbit (11.07% Earth radius altitude)
+			r_orb = radius * (1.0 + 705.0 / 6371.0)
+			ring_mat.albedo_color = Color(0.0, 0.88, 1.0, 0.45)
+			inclination_factor_y = 0.95
+			inclination_factor_z = 0.32
+		"Moon":
+			# NASA LRO 100 km Polar Mapping Orbit (5.76% Moon radius altitude)
+			r_orb = radius * (1.0 + 100.0 / 1737.4)
+			ring_mat.albedo_color = Color(0.70, 0.90, 1.0, 0.40)
+			inclination_factor_y = 1.0
+			inclination_factor_z = 0.08
+		"Mars":
+			# NASA MRO 255 km Science Orbit (7.52% Mars radius altitude)
+			r_orb = radius * (1.0 + 255.0 / 3389.5)
+			ring_mat.albedo_color = Color(1.0, 0.65, 0.25, 0.45)
+			inclination_factor_y = 0.98
+			inclination_factor_z = 0.22
+
 	ring_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_orbit_ring_instance.material_override = ring_mat
 
 	ring_mesh.surface_begin(Mesh.PRIMITIVE_LINE_STRIP)
 	var segments = 72
-	var r_orb = radius + 0.95 # Orbit height above Earth
 	for i in range(segments + 1):
 		var angle = (float(i) / float(segments)) * TAU
-		# Polar inclination (~98 degrees representation)
 		var px = cos(angle) * r_orb
-		var py = sin(angle) * r_orb * 0.95
-		var pz = sin(angle) * r_orb * 0.32
+		var py = sin(angle) * r_orb * inclination_factor_y
+		var pz = sin(angle) * r_orb * inclination_factor_z
 		ring_mesh.surface_add_vertex(Vector3(px, py, pz))
 	ring_mesh.surface_end()
 	add_child(_orbit_ring_instance)
@@ -213,6 +235,9 @@ func _setup_moon_environment(_sphere: SphereMesh) -> void:
 	grad.add_point(0.85, Color(0.85, 0.86, 0.88)) # Fresh impact ejecta rays
 	noise_tex.color_ramp = grad
 	mat.albedo_texture = noise_tex
+
+	# NASA LRO 100 km Polar Mapping Orbit Trajectory Ring
+	_setup_orbit_ring("Moon")
 
 # ==============================================================================
 # 3. ARES PATHFINDER // MARS JEZERO CRATER ENVIRONMENT
@@ -260,10 +285,16 @@ func _setup_mars_environment(_sphere: SphereMesh) -> void:
 	_atmosphere_mesh_instance.material_override = atmo_mat
 	add_child(_atmosphere_mesh_instance)
 
+	# NASA MRO 255 km Science Orbit Trajectory Ring
+	_setup_orbit_ring("Mars")
+
 # ==============================================================================
 # PHASE-BASED ENVIRONMENT ADAPTATION
 # ==============================================================================
 func _update_environment_for_phase() -> void:
-	if planet_type == "Earth":
-		if _orbit_ring_instance != null:
+	if _orbit_ring_instance != null:
+		if planet_type == "Earth":
 			_orbit_ring_instance.visible = (_current_phase >= 1)
+		else:
+			# Visible during orbital survey (phase 1) prior to atmospheric entry / landing
+			_orbit_ring_instance.visible = (_current_phase == 1)

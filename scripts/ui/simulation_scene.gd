@@ -95,6 +95,8 @@ var _free_cam_target: Vector3 = Vector3.ZERO
 var _is_dragging_free_orbit: bool = false
 var _is_dragging_free_pan: bool = false
 var _free_drag_prev_pos: Vector2 = Vector2.ZERO
+var _lbl_free_hint: Label
+var _lbl_earth_cam_hud: Label
 
 var _is_intro_playing: bool = true
 var _intro_elapsed: float = 0.0
@@ -159,11 +161,52 @@ func _ready() -> void:
 	UITheme.style_button(btn_cam_free, false)
 	UITheme.style_button(btn_cam_sample, false)
 
+	var gm = _gm()
+	var dest = gm.current_mission.destination if gm != null and gm.current_mission != null else "Earth"
+	if dest == "Earth":
+		btn_cam_surface.text = "EARTH CAM"
+		btn_cam_surface.tooltip_text = "Onboard Satellite Optical Imager (Facing Earth)"
+	else:
+		btn_cam_surface.text = "SURFACE"
+		btn_cam_surface.tooltip_text = "Surface Operations Camera"
+
 	btn_cam_vista.pressed.connect(func(): _set_cam_mode(CameraMode.VISTA, btn_cam_vista))
 	btn_cam_focus.pressed.connect(func(): _set_cam_mode(CameraMode.FOCUS, btn_cam_focus))
 	btn_cam_surface.pressed.connect(func(): _set_cam_mode(CameraMode.SURFACE, btn_cam_surface))
 	btn_cam_free.pressed.connect(func(): _set_cam_mode(CameraMode.FREE, btn_cam_free))
 	btn_cam_sample.pressed.connect(func(): _start_sampling_cutscene())
+
+	# Connect ViewportContainer direct GUI input for smooth, reliable free cam controls
+	if has_node("ViewportContainer"):
+		$ViewportContainer.gui_input.connect(_on_viewport_gui_input)
+
+	# Free Cam On-screen HUD Instructions
+	_lbl_free_hint = Label.new()
+	_lbl_free_hint.name = "LblFreeHint"
+	_lbl_free_hint.text = "[FREE CAM ACTIVE] LMB: Orbit | RMB / WASD: Pan | Wheel: Zoom | R: Reset Focus"
+	_lbl_free_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_lbl_free_hint.add_theme_color_override("font_color", UITheme.COLOR_ACCENT_CYAN)
+	_lbl_free_hint.add_theme_font_size_override("font_size", 12)
+	_lbl_free_hint.anchors_preset = Control.PRESET_BOTTOM_WIDE
+	_lbl_free_hint.offset_top = -66.0
+	_lbl_free_hint.offset_bottom = -46.0
+	_lbl_free_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_lbl_free_hint.visible = false
+	$UI.add_child(_lbl_free_hint)
+
+	# Earth Cam On-screen HUD Telemetry
+	_lbl_earth_cam_hud = Label.new()
+	_lbl_earth_cam_hud.name = "LblEarthCamHud"
+	_lbl_earth_cam_hud.text = "[ONBOARD NADIR OPTICAL SENSOR // 705 KM SSO]\nGROUND TRACK: 98.2° INC | 9-BAND MULTISPECTRAL PUSHBROOM ACTIVE"
+	_lbl_earth_cam_hud.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_lbl_earth_cam_hud.add_theme_color_override("font_color", Color(0.2, 0.9, 1.0, 0.9))
+	_lbl_earth_cam_hud.add_theme_font_size_override("font_size", 12)
+	_lbl_earth_cam_hud.anchors_preset = Control.PRESET_TOP_WIDE
+	_lbl_earth_cam_hud.offset_top = 74.0
+	_lbl_earth_cam_hud.offset_bottom = 114.0
+	_lbl_earth_cam_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_lbl_earth_cam_hud.visible = false
+	$UI.add_child(_lbl_earth_cam_hud)
 
 	# Sampling cutscene UI styling
 	UITheme.style_button(btn_skip_cutscene, true)
@@ -296,8 +339,16 @@ func _process(delta: float) -> void:
 func _update_camera_mode(delta: float, phase_idx: int) -> void:
 	var speed_mult = sim_engine.sim_speed
 
+	var destination = "Earth"
+	var gm = _gm()
+	if gm != null and gm.current_mission != null:
+		destination = gm.current_mission.destination
+
 	if _is_on_surface():
-		# On planetary surface: rover/lander is securely planted on ground
+		# On planetary surface: rover/lander is 1:1 on the ground terrain
+		craft_node.scale = craft_node.scale.lerp(Vector3(1.0, 1.0, 1.0), delta * 4.0)
+		craft_node.rotation.x = 0.0
+		craft_node.rotation.z = 0.0
 		craft_pivot.rotation.x = 0.0
 		craft_pivot.rotation.z = 0.0
 
@@ -318,47 +369,129 @@ func _update_camera_mode(delta: float, phase_idx: int) -> void:
 				cam_3d.look_at(craft_pivot.position + Vector3(0.0, 0.0, 0.2), Vector3.UP)
 
 			CameraMode.FREE:
+				_update_free_cam_keyboard(delta)
 				var rot_basis = Basis(Vector3.UP, _free_cam_rot_y) * Basis(Vector3.RIGHT, _free_cam_rot_x)
 				var offset = rot_basis * Vector3(0, 0, _free_cam_distance)
 				cam_3d.position = cam_3d.position.lerp(_free_cam_target + offset, delta * 8.0)
 				cam_3d.look_at(_free_cam_target, Vector3.UP)
 	else:
-		# In space: gentle turntable orbit
+		# In space (orbital phases around Earth, Moon, or Mars)
+		# 1. Scale spacecraft to authentic NASA representation (shrunk relative to planet)
+		var target_scale = Vector3(0.28, 0.28, 0.28)
+		if _current_cam_mode == CameraMode.FOCUS:
+			target_scale = Vector3(0.48, 0.48, 0.48)
+		craft_node.scale = craft_node.scale.lerp(target_scale, delta * 4.0)
+
+		# 2. Authentic NASA Orbital Altitude
+		# Earth: 705 km / 6371 km = 0.1107
+		# Moon: 100 km / 1737.4 km = 0.0576
+		# Mars: 255 km / 3389.5 km = 0.0752
+		var alt_ratio = 0.1107
+		if destination == "Moon":
+			alt_ratio = 0.0576
+		elif destination == "Mars":
+			alt_ratio = 0.0752
+
+		var planet_r = 3.5
+		if planet_node != null:
+			planet_r = planet_node.radius
+		var target_dist = planet_r * (1.0 + alt_ratio)
+		var p_pos = planet_node.position if planet_node != null else Vector3(0, -0.8, -4.5)
+		var dir_from_planet = Vector3(0.0, 0.17503, 0.98456)
+		var target_craft_pos = p_pos + dir_from_planet * target_dist
+		craft_pivot.position = craft_pivot.position.lerp(target_craft_pos, delta * 3.0)
+
+		# 3. Nadir-Pointing Attitude (Satellite Camera aperture on -Y face locks to Earth / Planet center)
+		var to_planet = (p_pos - craft_pivot.position).normalized()
+		var up_zenith = -to_planet
+		var fwd_vel = Vector3(1.0, 0.0, 0.0)
+		var fwd_ortho = (fwd_vel - up_zenith * fwd_vel.dot(up_zenith)).normalized()
+		var right_solar = up_zenith.cross(fwd_ortho)
+		var nadir_basis = Basis(right_solar, up_zenith, fwd_ortho)
+
+		# Authentic attitude control reaction-wheel minute stabilization jitter
+		var jitter_pitch = sin(Time.get_ticks_msec() * 0.001) * 0.015
+		var jitter_yaw = cos(Time.get_ticks_msec() * 0.0008) * 0.015
+		nadir_basis = nadir_basis * Basis(Vector3.RIGHT, jitter_pitch) * Basis(Vector3.UP, jitter_yaw)
+		craft_node.basis = craft_node.basis.slerp(nadir_basis, delta * 5.0)
+
+		# 4. Camera Views in Orbit
 		match _current_cam_mode:
 			CameraMode.VISTA:
-				craft_pivot.rotate_y(0.22 * delta * speed_mult)
-				var target_pos = Vector3(1.8, 1.2, 4.6)
-				cam_3d.position = cam_3d.position.lerp(target_pos, delta * 4.0)
-				cam_3d.look_at(craft_pivot.position * 0.7, Vector3.UP)
+				var target_cam_pos = craft_pivot.position + Vector3(0.95, 0.65, 2.3)
+				cam_3d.position = cam_3d.position.lerp(target_cam_pos, delta * 4.0)
+				cam_3d.look_at(craft_pivot.position + craft_node.position * 0.5, Vector3.UP)
 
 			CameraMode.FOCUS:
-				craft_pivot.rotate_y(0.18 * delta * speed_mult)
-				var target_pos = craft_pivot.position + Vector3(0.0, 0.35, 1.8)
-				cam_3d.position = cam_3d.position.lerp(target_pos, delta * 6.0)
-				cam_3d.look_at(craft_pivot.position, Vector3.UP)
+				var target_cam_pos = craft_pivot.position + Vector3(0.38, 0.28, 1.15)
+				cam_3d.position = cam_3d.position.lerp(target_cam_pos, delta * 6.0)
+				cam_3d.look_at(craft_pivot.position + craft_node.position, Vector3.UP)
 
 			CameraMode.SURFACE:
-				var target_pos = Vector3(0.2, 0.25, 2.2)
-				cam_3d.position = cam_3d.position.lerp(target_pos, delta * 4.0)
-				cam_3d.look_at(craft_pivot.position + Vector3(0, -0.2, 0), Vector3.UP)
+				# Onboard Satellite Camera (Nadir view looking directly down at Earth)
+				var cam_mount = craft_pivot.position + craft_node.position + craft_node.basis * Vector3(0.0, -0.26, 0.08)
+				cam_3d.position = cam_3d.position.lerp(cam_mount, delta * 5.0)
+				cam_3d.look_at(p_pos, Vector3.UP)
 
 			CameraMode.FREE:
+				_update_free_cam_keyboard(delta)
 				var rot_basis = Basis(Vector3.UP, _free_cam_rot_y) * Basis(Vector3.RIGHT, _free_cam_rot_x)
 				var offset = rot_basis * Vector3(0, 0, _free_cam_distance)
 				cam_3d.position = cam_3d.position.lerp(_free_cam_target + offset, delta * 8.0)
 				cam_3d.look_at(_free_cam_target, Vector3.UP)
 
+func _update_free_cam_keyboard(delta: float) -> void:
+	var pan_speed = 3.5 * delta
+	var right_vec = cam_3d.global_transform.basis.x
+	var up_vec = cam_3d.global_transform.basis.y
+	var fwd_vec = -cam_3d.global_transform.basis.z
+
+	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):
+		_free_cam_target += fwd_vec * pan_speed
+	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
+		_free_cam_target -= fwd_vec * pan_speed
+	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+		_free_cam_target -= right_vec * pan_speed
+	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+		_free_cam_target += right_vec * pan_speed
+	if Input.is_key_pressed(KEY_E):
+		_free_cam_target += up_vec * pan_speed
+	if Input.is_key_pressed(KEY_Q):
+		_free_cam_target -= up_vec * pan_speed
+	if Input.is_key_pressed(KEY_R):
+		_free_cam_target = craft_pivot.position + craft_node.position
+
 func _set_cam_mode(mode: CameraMode, active_btn: Button) -> void:
+	if _is_intro_playing:
+		_end_intro()
+
 	_current_cam_mode = mode
 	for b in [btn_cam_vista, btn_cam_focus, btn_cam_surface, btn_cam_free, btn_cam_sample]:
 		UITheme.style_button(b, b == active_btn)
 
+	if _lbl_free_hint != null:
+		_lbl_free_hint.visible = (mode == CameraMode.FREE)
+
+	var is_earth_cam = (mode == CameraMode.SURFACE and not _is_on_surface())
+	if _lbl_earth_cam_hud != null:
+		_lbl_earth_cam_hud.visible = is_earth_cam
+
+	if mode == CameraMode.FREE:
+		_free_cam_target = craft_pivot.position + craft_node.position
+		var rel = cam_3d.position - _free_cam_target
+		_free_cam_distance = clamp(rel.length(), 0.6, 12.0)
+		_free_cam_rot_y = atan2(rel.x, max(0.0001, rel.z))
+		_free_cam_rot_x = clamp(asin(clamp(rel.y / max(0.01, _free_cam_distance), -0.99, 0.99)), -PI/2.1, PI/2.1)
+
 func _end_intro() -> void:
+	if not _is_intro_playing:
+		return
 	_is_intro_playing = false
 	if panel_intro != null:
 		panel_intro.visible = false
-	cam_3d.position = Vector3(1.2, 0.8, 4.2)
-	cam_3d.look_at(craft_pivot.position, Vector3.UP)
+	if _current_cam_mode != CameraMode.FREE:
+		cam_3d.position = Vector3(1.2, 0.8, 4.2)
+		cam_3d.look_at(craft_pivot.position, Vector3.UP)
 
 func _on_skip_cutscene_pressed() -> void:
 	if _is_landing_cutscene:
@@ -366,12 +499,7 @@ func _on_skip_cutscene_pressed() -> void:
 	elif _is_sampling_cutscene:
 		_end_sampling_cutscene()
 
-func _unhandled_input(event: InputEvent) -> void:
-	if (_is_sampling_cutscene or _is_landing_cutscene) and (event is InputEventKey or event is InputEventMouseButton):
-		if event.is_pressed():
-			_on_skip_cutscene_pressed()
-			return
-
+func _on_viewport_gui_input(event: InputEvent) -> void:
 	if _is_intro_playing and (event is InputEventKey or event is InputEventMouseButton):
 		if event.is_pressed():
 			_end_intro()
@@ -388,21 +516,40 @@ func _unhandled_input(event: InputEvent) -> void:
 			_is_dragging_free_pan = event.pressed
 			_free_drag_prev_pos = event.position
 		elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			_free_cam_distance = clamp(_free_cam_distance - 0.35, 1.2, 10.0)
+			_free_cam_distance = clamp(_free_cam_distance - 0.25, 0.6, 12.0)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			_free_cam_distance = clamp(_free_cam_distance + 0.35, 1.2, 10.0)
+			_free_cam_distance = clamp(_free_cam_distance + 0.25, 0.6, 12.0)
 
 	elif event is InputEventMouseMotion:
 		var delta_pos = event.position - _free_drag_prev_pos
 		_free_drag_prev_pos = event.position
 
 		if _is_dragging_free_orbit:
-			_free_cam_rot_y -= delta_pos.x * 0.007
-			_free_cam_rot_x = clamp(_free_cam_rot_x - delta_pos.y * 0.007, -PI/2.4, PI/2.4)
+			_free_cam_rot_y -= delta_pos.x * 0.006
+			_free_cam_rot_x = clamp(_free_cam_rot_x - delta_pos.y * 0.006, -PI/2.1, PI/2.1)
 		elif _is_dragging_free_pan:
 			var right_vec = cam_3d.global_transform.basis.x
 			var up_vec = cam_3d.global_transform.basis.y
 			_free_cam_target -= (right_vec * delta_pos.x - up_vec * delta_pos.y) * 0.003
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and not event.pressed:
+		_is_dragging_free_orbit = false
+		_is_dragging_free_pan = false
+
+func _unhandled_input(event: InputEvent) -> void:
+	if (_is_sampling_cutscene or _is_landing_cutscene) and (event is InputEventKey or event is InputEventMouseButton):
+		if event.is_pressed():
+			_on_skip_cutscene_pressed()
+			return
+
+	if _is_intro_playing and (event is InputEventKey or event is InputEventMouseButton):
+		if event.is_pressed():
+			_end_intro()
+			return
+
+	if _current_cam_mode == CameraMode.FREE:
+		_on_viewport_gui_input(event)
 
 func _on_pause_toggle() -> void:
 	_is_paused = not _is_paused
@@ -475,8 +622,18 @@ func _on_telemetry_updated(telemetry: Dictionary) -> void:
 	]
 
 	var alt = telemetry.get("altitude_km", 0.0)
+	var gm = _gm()
+	var dest = gm.current_mission.destination if gm != null and gm.current_mission != null else "Earth"
 	if alt > 10000.0:
 		val_alt.text = "%.1fM km" % (alt / 1000000.0)
+	elif alt >= 700.0 and dest == "Earth":
+		val_alt.text = "705 km (11.1% R⊕)"
+	elif alt >= 90.0 and dest == "Moon" and not _is_on_surface():
+		val_alt.text = "100 km (5.8% R☾)"
+	elif alt >= 200.0 and dest == "Mars" and not _is_on_surface():
+		val_alt.text = "255 km (7.5% R♂)"
+	elif _is_on_surface():
+		val_alt.text = "0.0 km (Touchdown)"
 	else:
 		val_alt.text = "%.1f km" % alt
 

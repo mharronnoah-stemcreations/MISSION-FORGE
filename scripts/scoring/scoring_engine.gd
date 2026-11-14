@@ -146,9 +146,12 @@ static func _generate_engineering_analysis(
 		"Earth":
 			result.educational_takeaways.append("Spacecraft in 705 km Low Earth Orbit spend ~35 minutes of every 99-minute orbit in eclipse. Battery storage must sustain avionics heaters.")
 			result.educational_takeaways.append("Earth observation satellites utilize Sun-synchronous orbits so they cross the equator at the same local solar time on every pass, providing consistent lighting.")
+			result.educational_takeaways.append("NASA Landsat-9 & Terra maintain active 3-axis nadir pointing at 705 km altitude (11.1% of Earth radius), continuously facing optical camera apertures down at Earth while solar arrays articulate toward the Sun.")
 		"Moon":
 			result.educational_takeaways.append("Lacking an atmosphere to decelerate against, lunar landers must carry dedicated rocket engines and landing legs capable of canceling all 1.7 km/s orbital velocity.")
 			result.educational_takeaways.append("Permanently Shadowed Regions (PSRs) at the lunar south pole maintain temperatures of 40 Kelvin (-233°C), cold enough to trap water ice for over 2 billion years.")
+			result.educational_takeaways.append("NASA Lunar Reconnaissance Orbiter (LRO) maintains a 100 km circular polar orbit (5.8% of lunar radius), keeping its laser altimeter (LOLA) and radiometer locked directly onto the polar craters.")
 		"Mars":
 			result.educational_takeaways.append("Interplanetary radio light-travel time from Mars to Earth is 4 to 20 minutes. Atmospheric entry, descent, and landing (EDL) must be 100% autonomous.")
 			result.educational_takeaways.append("Mars' thin atmosphere requires a hypersonic heat shield to bleed 99% of kinetic energy, followed by supersonic parachutes and a rocket Sky Crane.")
+			result.educational_takeaways.append("NASA Mars Reconnaissance Orbiter (MRO) cruises at 255 km altitude (7.5% of Mars radius), providing high-resolution nadir orbital reconnaissance for surface rover operations.")

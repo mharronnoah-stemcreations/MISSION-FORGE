@@ -26,6 +26,14 @@
     "inst_lunar_seismometer"
   ],
   "brief_overview": "Execute Trans-Lunar Injection (TLI), enter lunar polar orbit, and complete an autonomous soft landing on the illuminated rim of Shackleton Crater (89.9°S). Deploy coring drills and an autonomous micro-rover into Permanently Shadowed Regions (PSRs) to prospect for cryo-trapped water ice volatiles.",
+  "nasa_flight_parameters": {
+    "orbit_type": "Lunar Polar Circular Orbit",
+    "altitude_km": 100.0,
+    "orbital_altitude_ratio": "100 km / 1,737.4 km radius (5.76% Moon radius altitude)",
+    "spacecraft_scale_nasa": "Lunar Reconnaissance Orbiter (LRO): 2.7m × 2.6m bus, 4.3m solar array span",
+    "sensor_alignment": "Nadir-pointing laser altimeter (LOLA) and Diviner radiometer facing lunar surface",
+    "nasa_heritage_reference": "NASA GSFC LRO Flight Dynamics & LOLA Science Investigation"
+  },
   "nasa_landing_sites": [
     {
       "name": "Site Alpha: Connecting Ridge (Peak of Eternal Light)",
@@ -68,7 +76,7 @@
     "Communications Line-of-Sight: Lunar south pole topography can obscure direct line-of-sight with Earth ground stations; medium-gain horn or relay required.",
     "Surface Mobility Requirement: A stationary lander on the rim cannot traverse the steep 30° crater wall without a dedicated micro-rover platform."
   ],
-  "educational_context": "Data from NASA's Lunar Reconnaissance Orbiter (LRO) LOLA altimeter, Diviner thermal radiometer, and KPLO ShadowCam revealed that the interior of Shackleton Crater is one of the coldest places in the solar system (40 Kelvin), allowing water ice to remain stable for billions of years. Water ice at the lunar poles can be split into hydrogen and oxygen rocket propellant, enabling sustainable human exploration under the NASA Artemis campaign.",
+  "educational_context": "Data from NASA's Lunar Reconnaissance Orbiter (LRO) LOLA altimeter, Diviner thermal radiometer, and KPLO ShadowCam revealed that the interior of Shackleton Crater is one of the coldest places in the solar system (40 Kelvin), allowing water ice to remain stable for billions of years. Water ice at the lunar poles can be split into hydrogen and oxygen rocket propellant, enabling sustainable human exploration under the NASA Artemis campaign. According to NASA GSFC flight dynamics, LRO maintains a circular mapping orbit at 100 km altitude (5.76% of the Moon's 1,737.4 km radius), maintaining active nadir pointing so laser altimeters and radiometers continuously target the polar cold traps below.",
   "nasa_reference_title": "NASA LRO / LOLA Science & Artemis South Pole Exploration",
   "nasa_reference_url": "https://lunar.gsfc.nasa.gov/"
 }
