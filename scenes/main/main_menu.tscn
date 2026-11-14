@@ -141,7 +141,7 @@ grow_vertical = 0
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.55, 0.68, 1)
 theme_override_font_sizes/font_size = 12
-text = "MISSION FORGE v2.0 | Developed for NASA Space Apps Challenge 2026 | Engine: Godot 4.x"
+text = "MISSION FORGE v1.0 | Developed for NASA Space Apps Challenge 2026 | Engine: Godot 4.x"
 
 [node name="Modals" type="Control" parent="."]
 layout_mode = 1
