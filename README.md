@@ -2,6 +2,7 @@
 ### 3D Educational Space Mission Design & Systems Engineering Simulator
 
 > **Event:** NASA Space Apps Challenge 2026 — *Space Mission Design Game*  
+> **Team:** Developed by Team J.A.I.M.E.  
 > **Tagline:** *Design. Launch. Survive. Discover.*  
 > **Engine:** Godot 4.7+ (Forward+ Desktop / Mobile Compatible)  
 > **Primary Technology:** GDScript 2.0 with Procedural 3D Visuals & Synthesized Audio  
