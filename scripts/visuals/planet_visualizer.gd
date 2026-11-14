@@ -167,41 +167,47 @@ func _setup_orbit_ring(type: String) -> void:
 	var ring_mat = StandardMaterial3D.new()
 	ring_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	
+	# Reference unit direction from planet center to the satellite flight location
+	var dir_sat = Vector3(0.0, 0.17503, 0.98456).normalized()
 	var r_orb = radius * (1.0 + 705.0 / 6371.0)
-	var inclination_factor_y = 0.95
-	var inclination_factor_z = 0.32
+	var inc_angle_deg = 10.5
 
 	match type:
 		"Earth":
-			# NASA 705 km Sun-Synchronous Orbit (11.07% Earth radius altitude)
+			# NASA 705 km Sun-Synchronous Orbit (11.07% Earth radius altitude, 98.2° inclination)
 			r_orb = radius * (1.0 + 705.0 / 6371.0)
-			ring_mat.albedo_color = Color(0.0, 0.88, 1.0, 0.45)
-			inclination_factor_y = 0.95
-			inclination_factor_z = 0.32
+			ring_mat.albedo_color = Color(0.0, 0.92, 1.0, 0.65)
+			inc_angle_deg = 10.5
 		"Moon":
-			# NASA LRO 100 km Polar Mapping Orbit (5.76% Moon radius altitude)
+			# NASA LRO 100 km Polar Mapping Orbit (5.76% Moon radius altitude, 90° inclination)
 			r_orb = radius * (1.0 + 100.0 / 1737.4)
-			ring_mat.albedo_color = Color(0.70, 0.90, 1.0, 0.40)
-			inclination_factor_y = 1.0
-			inclination_factor_z = 0.08
+			ring_mat.albedo_color = Color(0.75, 0.92, 1.0, 0.55)
+			inc_angle_deg = 0.0
 		"Mars":
-			# NASA MRO 255 km Science Orbit (7.52% Mars radius altitude)
+			# NASA MRO 255 km Science Orbit (7.52% Mars radius altitude, 93° inclination)
 			r_orb = radius * (1.0 + 255.0 / 3389.5)
-			ring_mat.albedo_color = Color(1.0, 0.65, 0.25, 0.45)
-			inclination_factor_y = 0.98
-			inclination_factor_z = 0.22
+			ring_mat.albedo_color = Color(1.0, 0.68, 0.28, 0.65)
+			inc_angle_deg = -5.0
 
 	ring_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_orbit_ring_instance.material_override = ring_mat
 
+	# Construct exact orbital plane basis:
+	# Orbit normal is orthogonal to dir_sat for any inclination angle
+	var rad = deg_to_rad(inc_angle_deg)
+	var orbit_normal = Vector3(cos(rad), -sin(rad) * dir_sat.z, sin(rad) * dir_sat.y).normalized()
+	var tangent_vel = orbit_normal.cross(dir_sat).normalized()
+
+	# vec_u coincides exactly with the satellite's position at angle 0!
+	var vec_u = dir_sat * r_orb
+	var vec_v = tangent_vel * r_orb
+
 	ring_mesh.surface_begin(Mesh.PRIMITIVE_LINE_STRIP)
-	var segments = 72
+	var segments = 96
 	for i in range(segments + 1):
 		var angle = (float(i) / float(segments)) * TAU
-		var px = cos(angle) * r_orb
-		var py = sin(angle) * r_orb * inclination_factor_y
-		var pz = sin(angle) * r_orb * inclination_factor_z
-		ring_mesh.surface_add_vertex(Vector3(px, py, pz))
+		var pt = vec_u * cos(angle) + vec_v * sin(angle)
+		ring_mesh.surface_add_vertex(pt)
 	ring_mesh.surface_end()
 	add_child(_orbit_ring_instance)
 

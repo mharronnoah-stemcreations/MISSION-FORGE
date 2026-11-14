@@ -285,6 +285,20 @@ func _init_simulation() -> void:
 	craft_node.add_child(_craft_preview_builder)
 	_craft_preview_builder.rebuild_spacecraft(spacecraft)
 
+	# Initial position and scale on authentic NASA orbital trajectory ring
+	var dest = mission.destination if mission != null else "Earth"
+	var init_alt_ratio = 705.0 / 6371.0
+	if dest == "Moon":
+		init_alt_ratio = 100.0 / 1737.4
+	elif dest == "Mars":
+		init_alt_ratio = 255.0 / 3389.5
+	var init_planet_r = planet_node.radius if planet_node != null else 3.5
+	var init_target_dist = init_planet_r * (1.0 + init_alt_ratio)
+	var init_p_pos = planet_node.position if planet_node != null else Vector3(0, -0.8, -4.5)
+	var init_dir_from_planet = Vector3(0.0, 0.17503, 0.98456).normalized()
+	craft_pivot.position = init_p_pos + init_dir_from_planet * init_target_dist
+	craft_node.scale = Vector3(0.28, 0.28, 0.28)
+
 	# Build thruster plume
 	_setup_thruster_plume()
 
@@ -329,8 +343,8 @@ func _process(delta: float) -> void:
 		_intro_elapsed += delta
 		var t = clampf(_intro_elapsed / INTRO_DURATION, 0.0, 1.0)
 		var ease_t = 1.0 - pow(1.0 - t, 3.0)
-		var start_cam_pos = Vector3(4.5, 6.0, 9.0)
-		var end_cam_pos = Vector3(1.2, 0.8, 4.2)
+		var start_cam_pos = craft_pivot.position + Vector3(3.5, 4.0, 6.5)
+		var end_cam_pos = craft_pivot.position + Vector3(0.95, 0.65, 2.3)
 		cam_3d.position = start_cam_pos.lerp(end_cam_pos, ease_t)
 		cam_3d.look_at(craft_pivot.position, Vector3.UP)
 		if t >= 1.0:
@@ -395,32 +409,37 @@ func _update_camera_mode(delta: float, phase_idx: int) -> void:
 			target_scale = Vector3(0.48, 0.48, 0.48)
 		craft_node.scale = craft_node.scale.lerp(target_scale, delta * 4.0)
 
-		# 2. Authentic NASA Orbital Altitude
-		# Earth: 705 km / 6371 km = 0.1107
-		# Moon: 100 km / 1737.4 km = 0.0576
-		# Mars: 255 km / 3389.5 km = 0.0752
-		var alt_ratio = 0.1107
+		# 2. Authentic NASA Orbital Altitude & Inclination
+		# Earth: 705 km / 6371 km SSO (11.07% altitude, 10.5° visual inclination)
+		# Moon: 100 km / 1737.4 km LLO (5.76% altitude, 0° polar)
+		# Mars: 255 km / 3389.5 km MSO (7.52% altitude, -5° inclination)
+		var alt_ratio = 705.0 / 6371.0
+		var inc_deg = 10.5
 		if destination == "Moon":
-			alt_ratio = 0.0576
+			alt_ratio = 100.0 / 1737.4
+			inc_deg = 0.0
 		elif destination == "Mars":
-			alt_ratio = 0.0752
+			alt_ratio = 255.0 / 3389.5
+			inc_deg = -5.0
 
 		var planet_r = 3.5
 		if planet_node != null:
 			planet_r = planet_node.radius
 		var target_dist = planet_r * (1.0 + alt_ratio)
 		var p_pos = planet_node.position if planet_node != null else Vector3(0, -0.8, -4.5)
-		var dir_from_planet = Vector3(0.0, 0.17503, 0.98456)
+		var dir_from_planet = Vector3(0.0, 0.17503, 0.98456).normalized()
 		var target_craft_pos = p_pos + dir_from_planet * target_dist
 		craft_pivot.position = craft_pivot.position.lerp(target_craft_pos, delta * 3.0)
 
 		# 3. Nadir-Pointing Attitude (Satellite Camera aperture on -Y face locks to Earth / Planet center)
+		# Tangent flight vector is strictly aligned with the orbital trajectory ring
 		var to_planet = (p_pos - craft_pivot.position).normalized()
 		var up_zenith = -to_planet
-		var fwd_vel = Vector3(1.0, 0.0, 0.0)
-		var fwd_ortho = (fwd_vel - up_zenith * fwd_vel.dot(up_zenith)).normalized()
-		var right_solar = up_zenith.cross(fwd_ortho)
-		var nadir_basis = Basis(right_solar, up_zenith, fwd_ortho)
+		var rad = deg_to_rad(inc_deg)
+		var orbit_normal = Vector3(cos(rad), -sin(rad) * dir_from_planet.z, sin(rad) * dir_from_planet.y).normalized()
+		var tangent_vel = orbit_normal.cross(dir_from_planet).normalized()
+		var right_solar = up_zenith.cross(tangent_vel)
+		var nadir_basis = Basis(right_solar, up_zenith, tangent_vel)
 
 		# Authentic attitude control reaction-wheel minute stabilization jitter
 		var jitter_pitch = sin(Time.get_ticks_msec() * 0.001) * 0.015
