@@ -170,32 +170,32 @@ func _setup_orbit_ring(type: String) -> void:
 	# Reference unit direction from planet center to the satellite flight location
 	var dir_sat = Vector3(0.0, 0.17503, 0.98456).normalized()
 	var r_orb = radius * (1.0 + 705.0 / 6371.0)
-	var inc_angle_deg = 10.5
+	var inc_angle_deg = 0.0
 
 	match type:
 		"Earth":
-			# NASA 705 km Sun-Synchronous Orbit (11.07% Earth radius altitude, 98.2° inclination)
+			# NASA 705 km Orbit (11.07% Earth radius altitude, horizontal orbital plane)
 			r_orb = radius * (1.0 + 705.0 / 6371.0)
 			ring_mat.albedo_color = Color(0.0, 0.92, 1.0, 0.65)
-			inc_angle_deg = 10.5
+			inc_angle_deg = 0.0
 		"Moon":
-			# NASA LRO 100 km Polar Mapping Orbit (5.76% Moon radius altitude, 90° inclination)
+			# NASA LRO 100 km Orbit (5.76% Moon radius altitude, horizontal orbital plane)
 			r_orb = radius * (1.0 + 100.0 / 1737.4)
 			ring_mat.albedo_color = Color(0.75, 0.92, 1.0, 0.55)
 			inc_angle_deg = 0.0
 		"Mars":
-			# NASA MRO 255 km Science Orbit (7.52% Mars radius altitude, 93° inclination)
+			# NASA MRO 255 km Science Orbit (7.52% Mars radius altitude, horizontal orbital plane)
 			r_orb = radius * (1.0 + 255.0 / 3389.5)
 			ring_mat.albedo_color = Color(1.0, 0.68, 0.28, 0.65)
-			inc_angle_deg = -5.0
+			inc_angle_deg = 0.0
 
 	ring_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_orbit_ring_instance.material_override = ring_mat
 
-	# Construct exact orbital plane basis:
-	# Orbit normal is orthogonal to dir_sat for any inclination angle
+	# Construct exact horizontal orbital plane basis:
+	# Normal vector is predominantly vertical (Y-axis), giving a horizontal equatorial orbit.
 	var rad = deg_to_rad(inc_angle_deg)
-	var orbit_normal = Vector3(cos(rad), -sin(rad) * dir_sat.z, sin(rad) * dir_sat.y).normalized()
+	var orbit_normal = Vector3(-sin(rad), dir_sat.z * cos(rad), -dir_sat.y * cos(rad)).normalized()
 	var tangent_vel = orbit_normal.cross(dir_sat).normalized()
 
 	# vec_u coincides exactly with the satellite's position at angle 0!

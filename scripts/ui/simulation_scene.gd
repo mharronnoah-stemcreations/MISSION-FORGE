@@ -218,7 +218,7 @@ func _ready() -> void:
 	# Earth Cam On-screen HUD Telemetry
 	_lbl_earth_cam_hud = Label.new()
 	_lbl_earth_cam_hud.name = "LblEarthCamHud"
-	_lbl_earth_cam_hud.text = "[ONBOARD NADIR OPTICAL SENSOR // 705 KM SSO]\nGROUND TRACK: 98.2° INC | 9-BAND MULTISPECTRAL PUSHBROOM ACTIVE"
+	_lbl_earth_cam_hud.text = "[ONBOARD NADIR OPTICAL SENSOR // 705 KM ORBIT]\nGROUND TRACK: EQUATORIAL HORIZONTAL ORBIT | 9-BAND MULTISPECTRAL PUSHBROOM ACTIVE"
 	_lbl_earth_cam_hud.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_lbl_earth_cam_hud.add_theme_color_override("font_color", Color(0.2, 0.9, 1.0, 0.9))
 	_lbl_earth_cam_hud.add_theme_font_size_override("font_size", 12)
@@ -423,17 +423,17 @@ func _update_camera_mode(delta: float, phase_idx: int) -> void:
 		craft_node.scale = craft_node.scale.lerp(target_scale, delta * 4.0)
 
 		# 2. Authentic NASA Orbital Altitude & Inclination
-		# Earth: 705 km / 6371 km SSO (11.07% altitude, 10.5° visual inclination)
-		# Moon: 100 km / 1737.4 km LLO (5.76% altitude, 0° polar)
-		# Mars: 255 km / 3389.5 km MSO (7.52% altitude, -5° inclination)
+		# Earth: 705 km / 6371 km SSO (11.07% altitude, horizontal orbit)
+		# Moon: 100 km / 1737.4 km LLO (5.76% altitude, horizontal orbit)
+		# Mars: 255 km / 3389.5 km MSO (7.52% altitude, horizontal orbit)
 		var alt_ratio = 705.0 / 6371.0
-		var inc_deg = 10.5
+		var inc_deg = 0.0
 		if destination == "Moon":
 			alt_ratio = 100.0 / 1737.4
 			inc_deg = 0.0
 		elif destination == "Mars":
 			alt_ratio = 255.0 / 3389.5
-			inc_deg = -5.0
+			inc_deg = 0.0
 
 		var planet_r = 3.5
 		if planet_node != null:
@@ -445,11 +445,11 @@ func _update_camera_mode(delta: float, phase_idx: int) -> void:
 		craft_pivot.position = craft_pivot.position.lerp(target_craft_pos, delta * 3.0)
 
 		# 3. Nadir-Pointing Attitude (Satellite Camera aperture on -Y face locks to Earth / Planet center)
-		# Tangent flight vector is strictly aligned with the orbital trajectory ring
+		# Tangent flight vector is strictly aligned with the horizontal orbital trajectory ring
 		var to_planet = (p_pos - craft_pivot.position).normalized()
 		var up_zenith = -to_planet
 		var rad = deg_to_rad(inc_deg)
-		var orbit_normal = Vector3(cos(rad), -sin(rad) * dir_from_planet.z, sin(rad) * dir_from_planet.y).normalized()
+		var orbit_normal = Vector3(-sin(rad), dir_from_planet.z * cos(rad), -dir_from_planet.y * cos(rad)).normalized()
 		var tangent_vel = orbit_normal.cross(dir_from_planet).normalized()
 		var right_solar = up_zenith.cross(tangent_vel)
 		var nadir_basis = Basis(right_solar, up_zenith, tangent_vel)
