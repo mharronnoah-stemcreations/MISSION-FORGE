@@ -917,7 +917,10 @@ func _start_landing_cutscene() -> void:
 	if _is_landing_cutscene or _is_sampling_cutscene:
 		return
 
+	craft_pivot.position = Vector3.ZERO
 	craft_pivot.rotation = Vector3.ZERO
+	craft_node.scale = Vector3(1.0, 1.0, 1.0)
+	craft_node.rotation = Vector3.ZERO
 	_prev_cam_mode_before_cutscene = _current_cam_mode
 	_is_landing_cutscene = true
 	_landing_elapsed = 0.0
@@ -1189,7 +1192,10 @@ func _start_sampling_cutscene() -> void:
 		return
 
 	# Align spacecraft/rover orientation forward so the cutscene is always centered & framed
+	craft_pivot.position = Vector3.ZERO
 	craft_pivot.rotation = Vector3.ZERO
+	craft_node.scale = Vector3(1.0, 1.0, 1.0)
+	craft_node.rotation = Vector3.ZERO
 
 	_setup_sampling_rig()
 	if _sampling_rig != null:
