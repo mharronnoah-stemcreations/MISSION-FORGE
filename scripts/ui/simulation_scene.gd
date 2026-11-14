@@ -161,8 +161,11 @@ func _ready() -> void:
 	UITheme.style_button(btn_cam_free, false)
 	UITheme.style_button(btn_cam_sample, false)
 
+	var dest = "Earth"
 	var gm = _gm()
-	var dest = gm.current_mission.destination if gm != null and gm.current_mission != null else "Earth"
+	if gm != null and gm.current_mission != null:
+		dest = gm.current_mission.destination
+
 	if dest == "Earth":
 		btn_cam_surface.text = "EARTH CAM"
 		btn_cam_surface.tooltip_text = "Onboard Satellite Optical Imager (Facing Earth)"
@@ -187,7 +190,12 @@ func _ready() -> void:
 	_lbl_free_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_lbl_free_hint.add_theme_color_override("font_color", UITheme.COLOR_ACCENT_CYAN)
 	_lbl_free_hint.add_theme_font_size_override("font_size", 12)
-	_lbl_free_hint.anchors_preset = Control.PRESET_BOTTOM_WIDE
+	_lbl_free_hint.anchor_left = 0.0
+	_lbl_free_hint.anchor_right = 1.0
+	_lbl_free_hint.anchor_top = 1.0
+	_lbl_free_hint.anchor_bottom = 1.0
+	_lbl_free_hint.offset_left = 0.0
+	_lbl_free_hint.offset_right = 0.0
 	_lbl_free_hint.offset_top = -66.0
 	_lbl_free_hint.offset_bottom = -46.0
 	_lbl_free_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -201,7 +209,12 @@ func _ready() -> void:
 	_lbl_earth_cam_hud.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_lbl_earth_cam_hud.add_theme_color_override("font_color", Color(0.2, 0.9, 1.0, 0.9))
 	_lbl_earth_cam_hud.add_theme_font_size_override("font_size", 12)
-	_lbl_earth_cam_hud.anchors_preset = Control.PRESET_TOP_WIDE
+	_lbl_earth_cam_hud.anchor_left = 0.0
+	_lbl_earth_cam_hud.anchor_right = 1.0
+	_lbl_earth_cam_hud.anchor_top = 0.0
+	_lbl_earth_cam_hud.anchor_bottom = 0.0
+	_lbl_earth_cam_hud.offset_left = 0.0
+	_lbl_earth_cam_hud.offset_right = 0.0
 	_lbl_earth_cam_hud.offset_top = 74.0
 	_lbl_earth_cam_hud.offset_bottom = 114.0
 	_lbl_earth_cam_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -413,7 +426,7 @@ func _update_camera_mode(delta: float, phase_idx: int) -> void:
 		var jitter_pitch = sin(Time.get_ticks_msec() * 0.001) * 0.015
 		var jitter_yaw = cos(Time.get_ticks_msec() * 0.0008) * 0.015
 		nadir_basis = nadir_basis * Basis(Vector3.RIGHT, jitter_pitch) * Basis(Vector3.UP, jitter_yaw)
-		craft_node.basis = craft_node.basis.slerp(nadir_basis, delta * 5.0)
+		craft_node.quaternion = craft_node.quaternion.slerp(nadir_basis.get_rotation_quaternion(), delta * 5.0)
 
 		# 4. Camera Views in Orbit
 		match _current_cam_mode:
