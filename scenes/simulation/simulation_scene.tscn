@@ -458,27 +458,27 @@ mouse_filter = 2
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 80.0
+offset_bottom = 52.0
 grow_horizontal = 2
-color = Color(0, 0, 0, 0.94)
+color = Color(0, 0, 0, 0.90)
 
 [node name="HBoxTop" type="HBoxContainer" parent="UI/CutsceneSampling/BarTop"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 28.0
-offset_top = 14.0
-offset_right = -28.0
-offset_bottom = -14.0
+offset_left = 24.0
+offset_top = 8.0
+offset_right = -24.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 18
+theme_override_constants/separation = 16
 
 [node name="LblRec" type="Label" parent="UI/CutsceneSampling/BarTop/HBoxTop"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.25, 0.25, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "REC // HD TELEMETRY"
 
 [node name="VSep" type="VSeparator" parent="UI/CutsceneSampling/BarTop/HBoxTop"]
@@ -491,19 +491,19 @@ size_flags_horizontal = 3
 [node name="LblCutsceneTitle" type="Label" parent="UI/CutsceneSampling/BarTop/HBoxTop/VBoxInfo"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.9, 1, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 text = "AUTONOMOUS SURFACE SAMPLING OPERATIONS"
 
 [node name="LblCutsceneTarget" type="Label" parent="UI/CutsceneSampling/BarTop/HBoxTop/VBoxInfo"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 11
 text = "TARGET: JEZERO CRATER DELTA // LACUSTRINE SEDIMENTARY BEDROCK"
 
 [node name="LblCutsceneTime" type="Label" parent="UI/CutsceneSampling/BarTop/HBoxTop"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "SOL 42 // T+00:04:12"
 
 [node name="BarBottom" type="ColorRect" parent="UI/CutsceneSampling"]
@@ -512,28 +512,28 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -95.0
+offset_top = -68.0
 grow_horizontal = 2
 grow_vertical = 0
-color = Color(0, 0, 0, 0.94)
+color = Color(0, 0, 0, 0.90)
 
 [node name="HBoxBottom" type="HBoxContainer" parent="UI/CutsceneSampling/BarBottom"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 28.0
-offset_top = 14.0
-offset_right = -28.0
-offset_bottom = -14.0
+offset_left = 24.0
+offset_top = 8.0
+offset_right = -24.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 24
+theme_override_constants/separation = 20
 
 [node name="VBoxSteps" type="VBoxContainer" parent="UI/CutsceneSampling/BarBottom/HBoxBottom"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
 [node name="HBoxBadges" type="HBoxContainer" parent="UI/CutsceneSampling/BarBottom/HBoxBottom/VBoxSteps"]
 layout_mode = 2
@@ -558,7 +558,7 @@ theme_override_font_sizes/font_size = 11
 text = "[3. HERMETIC SEAL]"
 
 [node name="BarCoring" type="ProgressBar" parent="UI/CutsceneSampling/BarBottom/HBoxBottom/VBoxSteps"]
-custom_minimum_size = Vector2(0, 14)
+custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 size_flags_horizontal = 3
 value = 0.0
@@ -571,10 +571,10 @@ theme_override_font_sizes/font_size = 11
 text = "Coring depth: 0.0 cm / 15.0 cm | Rate: 2,400 BPM"
 
 [node name="BtnSkipCutscene" type="Button" parent="UI/CutsceneSampling/BarBottom/HBoxBottom"]
-custom_minimum_size = Vector2(140, 36)
+custom_minimum_size = Vector2(130, 32)
 layout_mode = 2
 size_flags_vertical = 4
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 11
 text = "SKIP CUTSCENE >>"
 
 [node name="CenterHUD" type="Control" parent="UI/CutsceneSampling"]
@@ -588,22 +588,14 @@ mouse_filter = 2
 
 [node name="ReticleTarget" type="Label" parent="UI/CutsceneSampling/CenterHUD"]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -140.0
-offset_top = -60.0
-offset_right = 140.0
-offset_bottom = 60.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0, 0.9, 1, 0.8)
-theme_override_font_sizes/font_size = 12
-text = "[ + ]
-BOREHOLE TARGET // ANCIENT FLUVIAL SILTSTONE
-MINERALOGY: SMECTITE CLAY & CARBONATES"
-horizontal_alignment = 1
-vertical_alignment = 1
+anchors_preset = 0
+offset_left = 32.0
+offset_top = 64.0
+offset_right = 360.0
+offset_bottom = 135.0
+theme_override_colors/font_color = Color(0, 0.9, 1, 0.85)
+theme_override_font_sizes/font_size = 11
+text = "[ + ] TACTICAL HUD // SAMPLING TELEMETRY
+TARGET: LACUSTRINE SEDIMENTARY OUTCROP
+MINERALOGY: Fe/Mg SMECTITE CLAYS & CARBONATES"
 

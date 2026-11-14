@@ -551,10 +551,10 @@ func _setup_sampling_rig() -> void:
 	var dest = gm.current_mission.destination if gm != null and gm.current_mission != null else "Mars"
 	var is_mars = (dest == "Mars")
 
-	# 1. Surface Bedrock Outcrop Slab beneath rover front equipment deck
+	# 1. Wide Surface Bedrock Outcrop Slab beneath rover front equipment deck
 	var bedrock = MeshInstance3D.new()
 	var b_box = BoxMesh.new()
-	b_box.size = Vector3(1.6, 0.18, 1.4)
+	b_box.size = Vector3(2.6, 0.22, 2.2)
 	bedrock.mesh = b_box
 	bedrock.position = Vector3(-0.25, -0.42, 0.95)
 
@@ -572,11 +572,11 @@ func _setup_sampling_rig() -> void:
 	# 2. Concentric Target Ring on Bedrock
 	var ring = MeshInstance3D.new()
 	var r_cyl = CylinderMesh.new()
-	r_cyl.top_radius = 0.09
-	r_cyl.bottom_radius = 0.09
+	r_cyl.top_radius = 0.11
+	r_cyl.bottom_radius = 0.11
 	r_cyl.height = 0.005
 	ring.mesh = r_cyl
-	ring.position = Vector3(-0.23, -0.325, 0.95)
+	ring.position = Vector3(-0.23, -0.305, 0.95)
 	var r_mat = StandardMaterial3D.new()
 	r_mat.albedo_color = Color(0.2, 0.22, 0.26)
 	r_mat.roughness = 0.9
@@ -590,7 +590,7 @@ func _setup_sampling_rig() -> void:
 	hole.bottom_radius = 0.024
 	hole.height = 0.02
 	_borehole_mesh.mesh = hole
-	_borehole_mesh.position = Vector3(-0.23, -0.326, 0.95)
+	_borehole_mesh.position = Vector3(-0.23, -0.306, 0.95)
 	var h_mat = StandardMaterial3D.new()
 	h_mat.albedo_color = Color(0.08, 0.05, 0.04)
 	_borehole_mesh.material_override = h_mat
@@ -610,10 +610,10 @@ func _setup_sampling_rig() -> void:
 	# 5. Laser Impact Glow Disk on Rock Surface
 	_laser_impact_mesh = MeshInstance3D.new()
 	var imp = SphereMesh.new()
-	imp.radius = 0.035
-	imp.height = 0.015
+	imp.radius = 0.045
+	imp.height = 0.018
 	_laser_impact_mesh.mesh = imp
-	_laser_impact_mesh.position = Vector3(-0.23, -0.32, 0.95)
+	_laser_impact_mesh.position = Vector3(-0.23, -0.30, 0.95)
 	var imp_mat = StandardMaterial3D.new()
 	imp_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	imp_mat.albedo_color = Color(1.0, 0.9, 0.5, 0.9)
@@ -625,6 +625,10 @@ func _setup_sampling_rig() -> void:
 func _start_sampling_cutscene() -> void:
 	if _is_sampling_cutscene:
 		return
+
+	# Align spacecraft/rover orientation forward so the cutscene is always centered & framed
+	craft_pivot.rotation = Vector3.ZERO
+
 	_setup_sampling_rig()
 	if _sampling_rig != null:
 		_sampling_rig.visible = true
@@ -674,23 +678,24 @@ func _update_sampling_cutscene(delta: float) -> void:
 	lbl_cutscene_time.text = "SOL %d // T+00:%02d:%02d" % [42 if is_mars else 14, sol_sec / 60, sol_sec % 60]
 
 	# Target contact coordinate on rock
-	var rock_target = Vector3(-0.23, -0.32, 0.95)
+	var rock_target = Vector3(-0.23, -0.30, 0.95)
 	var laser_origin = Vector3(0.12, 0.44, 0.22) if is_mars else Vector3(-0.23, 0.25, 0.70)
 
 	if t < 3.0:
 		# ======================================================================
-		# STAGE 1: LASER SPECTROSCOPY / TARGET SCAN (0.0s - 3.0s)
+		# STAGE 1: LASER SPECTROSCOPY / WIDE SHOT (0.0s - 3.0s)
+		# Clear establishing view of whole vehicle, mast, laser beam & rock
 		# ======================================================================
 		var st1_t = t / 3.0
 		badge_1.add_theme_color_override("font_color", UITheme.COLOR_ACCENT_CYAN)
 		badge_2.add_theme_color_override("font_color", UITheme.COLOR_TEXT_MUTED)
 		badge_3.add_theme_color_override("font_color", UITheme.COLOR_TEXT_MUTED)
 
-		# Camera sweeps low across bedrock toward the rover
-		var cam_start = Vector3(-0.95, 0.45, 1.85)
-		var cam_end = Vector3(-0.48, 0.32, 1.35)
+		# Clear wide 3-meter camera framing of the full rover and drill setup
+		var cam_start = Vector3(-2.6, 1.3, 3.4)
+		var cam_end = Vector3(-1.9, 0.95, 2.5)
 		cam_3d.position = cam_start.lerp(cam_end, ease(st1_t, 0.5))
-		cam_3d.look_at(Vector3(-0.23, -0.15, 0.92), Vector3.UP)
+		cam_3d.look_at(Vector3(-0.15, 0.15, 0.6), Vector3.UP)
 
 		# Pulsing laser beam
 		var laser_flicker = sin(t * 24.0) > 0.0
@@ -715,11 +720,12 @@ func _update_sampling_cutscene(delta: float) -> void:
 
 		bar_coring.value = 0.0
 		lbl_coring_status.text = "Laser Ablation: Vaporizing surface dust | Minerals: Fe/Mg smectite clays & carbonates"
-		reticle_target.text = "[ + ]\nSPECTRAL TARGET ACQUIRED\nORGANIC BIOMARKER TARGET IDENTIFIED"
+		reticle_target.text = "[ + ] TACTICAL HUD // SAMPLING TELEMETRY\nTARGET: LACUSTRINE SEDIMENTARY OUTCROP\nSTATUS: LASER SPECTRAL SCAN NOMINAL"
 
 	elif t < 7.0:
 		# ======================================================================
 		# STAGE 2: PERCUSSIVE ROTARY CORING (3.0s - 7.0s)
+		# Clear medium profile shot (2.2m distance) framing the entire robotic arm & rock
 		# ======================================================================
 		var st2_t = (t - 3.0) / 4.0
 		badge_1.add_theme_color_override("font_color", UITheme.COLOR_SUCCESS)
@@ -730,11 +736,11 @@ func _update_sampling_cutscene(delta: float) -> void:
 			_laser_mesh.clear_surfaces()
 		_laser_impact_mesh.visible = false
 
-		# Macro close-up on drill turret and rock borehole
-		var macro_cam = Vector3(-0.35, 0.18, 1.05)
-		var cam_shake = Vector3(randf_range(-0.003, 0.003), randf_range(-0.004, 0.004), randf_range(-0.003, 0.003))
-		cam_3d.position = macro_cam + cam_shake
-		cam_3d.look_at(Vector3(-0.23, -0.32, 0.95), Vector3.UP)
+		# Comfortable profile perspective framing the arm, bit, and bedrock
+		var cam_pos = Vector3(-1.45, 0.65, 1.95)
+		var cam_shake = Vector3(randf_range(-0.002, 0.002), randf_range(-0.003, 0.003), randf_range(-0.002, 0.002))
+		cam_3d.position = cam_pos + cam_shake
+		cam_3d.look_at(Vector3(-0.23, -0.10, 0.92), Vector3.UP)
 
 		# Deepen borehole cylinder mesh
 		var cur_depth_cm = lerpf(0.0, 12.4, st2_t)
@@ -753,7 +759,7 @@ func _update_sampling_cutscene(delta: float) -> void:
 		lbl_coring_status.text = "Coring depth: %.1f cm / 15.0 cm | Rate: 2,400 BPM | Bit Temp: %.0f°C" % [
 			cur_depth_cm, 35.0 + st2_t * 18.0
 		]
-		reticle_target.text = "[ + ]\nPERCUSSIVE CORING IN PROGRESS\nDEPTH: %.1f CM // ROTARY TORQUE: 42 NM" % cur_depth_cm
+		reticle_target.text = "[ + ] TACTICAL HUD // SAMPLING TELEMETRY\nPERCUSSIVE ROTARY CORING IN PROGRESS\nDEPTH: %.1f CM // ROTARY TORQUE: 42 NM" % cur_depth_cm
 
 		# Drill motor audio pulse
 		_audio_drill_cooldown -= delta
@@ -766,6 +772,7 @@ func _update_sampling_cutscene(delta: float) -> void:
 	elif t < SAMPLING_DURATION:
 		# ======================================================================
 		# STAGE 3: HERMETIC TUBE CACHE & SEAL (7.0s - 9.5s)
+		# Elevated cinematic reveal showing core lifted and sealed in carousel
 		# ======================================================================
 		var st3_t = (t - 7.0) / 2.5
 		badge_1.add_theme_color_override("font_color", UITheme.COLOR_SUCCESS)
@@ -782,10 +789,10 @@ func _update_sampling_cutscene(delta: float) -> void:
 		if drill_wrapper != null:
 			drill_wrapper.position.y = 0.445
 
-		# Elevation camera pulling back to show rover with sample secured
-		var cam_end = Vector3(-0.55, 0.48, 1.25)
-		cam_3d.position = cam_end
-		cam_3d.look_at(Vector3(-0.25, 0.15, 0.7), Vector3.UP)
+		# Elevated 3/4 camera pulling back to reveal rover with core sealed
+		var cam_pos = Vector3(-1.8, 1.25, 2.5)
+		cam_3d.position = cam_pos
+		cam_3d.look_at(Vector3(-0.15, 0.25, 0.6), Vector3.UP)
 
 		# Seal flash ring on carousel
 		_laser_impact_mesh.visible = (st3_t < 0.4)
@@ -796,7 +803,7 @@ func _update_sampling_cutscene(delta: float) -> void:
 
 		bar_coring.value = 100.0
 		lbl_coring_status.text = "Hermetic Titanium Seal: 100% Locked | Sample cached in carousel slot #01"
-		reticle_target.text = "[ OK ]\nSAMPLE CORE HERMETICALLY SEALED\nCACHED FOR MARS SAMPLE RETURN // +35 MB ARCHIVED"
+		reticle_target.text = "[ OK ] TACTICAL HUD // SAMPLING TELEMETRY\nSAMPLE CORE HERMETICALLY SEALED\nCACHED FOR MARS SAMPLE RETURN // +35 MB ARCHIVED"
 
 	else:
 		_end_sampling_cutscene()
