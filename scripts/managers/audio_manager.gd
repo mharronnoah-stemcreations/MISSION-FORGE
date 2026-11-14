@@ -33,6 +33,10 @@ func _pregenerate_sounds() -> void:
 	_synth_cache["laser"] = _generate_tone(2200.0, 0.045, 0.28, 0.002, 0.043, true)
 	_synth_cache["drill"] = _generate_tone(140.0, 0.16, 0.35, 0.01, 0.15, true)
 	_synth_cache["seal"] = _generate_chord([440.0, 659.25, 880.0], 0.22, 0.35)
+	_synth_cache["retro_rocket"] = _generate_noise_ramp(1.6, 0.45)
+	_synth_cache["touchdown"] = _generate_tone(85.0, 0.35, 0.55, 0.005, 0.34, true)
+	_synth_cache["servo"] = _generate_tone(1150.0, 0.18, 0.18, 0.02, 0.16, false)
+	_synth_cache["cable_cut"] = _generate_tone(2800.0, 0.05, 0.45, 0.001, 0.049, true)
 
 func play_sfx(sound_name: String) -> void:
 	if not sfx_enabled:
@@ -77,6 +81,18 @@ func play_drill() -> void:
 
 func play_seal() -> void:
 	play_sfx("seal")
+
+func play_retro_rocket() -> void:
+	play_sfx("retro_rocket")
+
+func play_touchdown() -> void:
+	play_sfx("touchdown")
+
+func play_servo() -> void:
+	play_sfx("servo")
+
+func play_cable_cut() -> void:
+	play_sfx("cable_cut")
 
 # Procedural Sound Generators
 func _generate_tone(freq: float, duration: float, amp: float, attack: float, decay: float, square: bool) -> AudioStreamWAV:
