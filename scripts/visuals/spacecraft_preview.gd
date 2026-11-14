@@ -42,6 +42,12 @@ var _line_mesh_instance: MeshInstance3D
 var _line_mesh: ImmediateMesh
 var _highlight_node: Node3D
 
+func get_component_node(comp_id: String) -> Node3D:
+	return _component_nodes.get(comp_id, null)
+
+func get_all_component_nodes() -> Dictionary:
+	return _component_nodes
+
 func _ready() -> void:
 	_cam_pivot = Node3D.new()
 	add_child(_cam_pivot)

@@ -349,6 +349,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "FREE"
 
+[node name="BtnCamSample" type="Button" parent="UI/PanelControls/HBox"]
+visible = false
+custom_minimum_size = Vector2(105, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "SAMPLE CAM"
+
 [node name="Spacer" type="Control" parent="UI/PanelControls/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -436,3 +443,167 @@ autowrap_mode = 3
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
+
+[node name="CutsceneSampling" type="Control" parent="UI"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BarTop" type="ColorRect" parent="UI/CutsceneSampling"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 80.0
+grow_horizontal = 2
+color = Color(0, 0, 0, 0.94)
+
+[node name="HBoxTop" type="HBoxContainer" parent="UI/CutsceneSampling/BarTop"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = 14.0
+offset_right = -28.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 18
+
+[node name="LblRec" type="Label" parent="UI/CutsceneSampling/BarTop/HBoxTop"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.25, 0.25, 1)
+theme_override_font_sizes/font_size = 13
+text = "REC // HD TELEMETRY"
+
+[node name="VSep" type="VSeparator" parent="UI/CutsceneSampling/BarTop/HBoxTop"]
+layout_mode = 2
+
+[node name="VBoxInfo" type="VBoxContainer" parent="UI/CutsceneSampling/BarTop/HBoxTop"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LblCutsceneTitle" type="Label" parent="UI/CutsceneSampling/BarTop/HBoxTop/VBoxInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "AUTONOMOUS SURFACE SAMPLING OPERATIONS"
+
+[node name="LblCutsceneTarget" type="Label" parent="UI/CutsceneSampling/BarTop/HBoxTop/VBoxInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 12
+text = "TARGET: JEZERO CRATER DELTA // LACUSTRINE SEDIMENTARY BEDROCK"
+
+[node name="LblCutsceneTime" type="Label" parent="UI/CutsceneSampling/BarTop/HBoxTop"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 13
+text = "SOL 42 // T+00:04:12"
+
+[node name="BarBottom" type="ColorRect" parent="UI/CutsceneSampling"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -95.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0, 0, 0, 0.94)
+
+[node name="HBoxBottom" type="HBoxContainer" parent="UI/CutsceneSampling/BarBottom"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = 14.0
+offset_right = -28.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 24
+
+[node name="VBoxSteps" type="VBoxContainer" parent="UI/CutsceneSampling/BarBottom/HBoxBottom"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="HBoxBadges" type="HBoxContainer" parent="UI/CutsceneSampling/BarBottom/HBoxBottom/VBoxSteps"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Badge1" type="Label" parent="UI/CutsceneSampling/BarBottom/HBoxBottom/VBoxSteps/HBoxBadges"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "[1. LASER SPECTROSCOPY]"
+
+[node name="Badge2" type="Label" parent="UI/CutsceneSampling/BarBottom/HBoxBottom/VBoxSteps/HBoxBadges"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.6, 0.7, 1)
+theme_override_font_sizes/font_size = 11
+text = "[2. PERCUSSIVE CORING]"
+
+[node name="Badge3" type="Label" parent="UI/CutsceneSampling/BarBottom/HBoxBottom/VBoxSteps/HBoxBadges"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.6, 0.7, 1)
+theme_override_font_sizes/font_size = 11
+text = "[3. HERMETIC SEAL]"
+
+[node name="BarCoring" type="ProgressBar" parent="UI/CutsceneSampling/BarBottom/HBoxBottom/VBoxSteps"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+size_flags_horizontal = 3
+value = 0.0
+show_percentage = false
+
+[node name="LblCoringStatus" type="Label" parent="UI/CutsceneSampling/BarBottom/HBoxBottom/VBoxSteps"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 11
+text = "Coring depth: 0.0 cm / 15.0 cm | Rate: 2,400 BPM"
+
+[node name="BtnSkipCutscene" type="Button" parent="UI/CutsceneSampling/BarBottom/HBoxBottom"]
+custom_minimum_size = Vector2(140, 36)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 12
+text = "SKIP CUTSCENE >>"
+
+[node name="CenterHUD" type="Control" parent="UI/CutsceneSampling"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ReticleTarget" type="Label" parent="UI/CutsceneSampling/CenterHUD"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -60.0
+offset_right = 140.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 0.8)
+theme_override_font_sizes/font_size = 12
+text = "[ + ]
+BOREHOLE TARGET // ANCIENT FLUVIAL SILTSTONE
+MINERALOGY: SMECTITE CLAY & CARBONATES"
+horizontal_alignment = 1
+vertical_alignment = 1
+

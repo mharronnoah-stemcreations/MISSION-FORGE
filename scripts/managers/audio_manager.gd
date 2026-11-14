@@ -30,6 +30,9 @@ func _pregenerate_sounds() -> void:
 	_synth_cache["telemetry"] = _generate_tone(1760.0, 0.03, 0.2, 0.003, 0.027, false)
 	_synth_cache["launch"] = _generate_noise_ramp(1.8, 0.5)
 	_synth_cache["success"] = _generate_chord([523.25, 659.25, 783.99, 1046.50], 0.4, 0.4)
+	_synth_cache["laser"] = _generate_tone(2200.0, 0.045, 0.28, 0.002, 0.043, true)
+	_synth_cache["drill"] = _generate_tone(140.0, 0.16, 0.35, 0.01, 0.15, true)
+	_synth_cache["seal"] = _generate_chord([440.0, 659.25, 880.0], 0.22, 0.35)
 
 func play_sfx(sound_name: String) -> void:
 	if not sfx_enabled:
@@ -65,6 +68,15 @@ func play_launch() -> void:
 
 func play_success() -> void:
 	play_sfx("success")
+
+func play_laser() -> void:
+	play_sfx("laser")
+
+func play_drill() -> void:
+	play_sfx("drill")
+
+func play_seal() -> void:
+	play_sfx("seal")
 
 # Procedural Sound Generators
 func _generate_tone(freq: float, duration: float, amp: float, attack: float, decay: float, square: bool) -> AudioStreamWAV:
