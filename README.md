@@ -8,6 +8,24 @@
 
 ---
 
+## ⚡ Quick Start & How to Play
+
+### Option 1: Direct Play (Windows Standalone)
+1. Download or extract `MF ver. 1.0.0.zip` (available in the root repository or under [Releases](https://github.com/mharronnoah-stemcreations/MISSION-FORGE/releases)).
+2. Extract the archive contents into a folder.
+3. Launch `MISSION_FORGE.exe` to start the game directly. No engine installation required!
+
+### Option 2: Running from Source (Godot Developers)
+1. Install **Godot Engine 4.3+ (.NET / C# Edition)** and **.NET 8.0 SDK**.
+2. Clone this repository:
+   ```bash
+   git clone https://github.com/mharronnoah-stemcreations/MISSION-FORGE.git
+   ```
+3. Open Godot, click **Import**, and select `project.godot`.
+4. Build the project C# solution and click **Run (F5)**.
+
+---
+
 ## 1. Executive Summary & Aerospace Philosophy
 
 **MISSIONFORGE** is a scientifically defensible, interactive 3D aerospace systems engineering simulation game built for the **NASA Space Apps Challenge 2026**. Players step into the shoes of a NASA Flight Director and Chief Systems Engineer to design, validate, launch, and actively command interplanetary robotic missions.
