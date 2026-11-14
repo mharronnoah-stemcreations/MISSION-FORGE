@@ -291,20 +291,45 @@ func _update_telemetry(delta: float) -> void:
 	emit_signal("telemetry_updated", telemetry)
 
 func _update_power_physics(delta: float) -> void:
-	var available_gen_w = spacecraft.total_power_generation
-	var active_con_w = spacecraft.total_power_consumption
+	# 1. Generation: MMRTG nuclear power is constant 24/7; solar arrays scale by distance and eclipse shadow
+	var rtg_gen_w = 0.0
+	var solar_gen_w = 0.0
+	for comp in spacecraft.selected_components:
+		if comp.id.contains("rtg") or comp.visual_type == "rtg_generator":
+			rtg_gen_w += comp.power_generation
+		elif comp.power_generation > 0.0:
+			solar_gen_w += comp.power_generation
 
-	# Environmental flux scaling
+	var solar_flux = 1.0
 	match mission.destination:
 		"Mars":
 			# Mars receives ~43% solar flux (1 / 1.524^2)
-			if not spacecraft.has_component("power_rtg") and not spacecraft.has_component("power_dual_rtg"):
-				available_gen_w *= 0.43
+			solar_flux = 0.43
 		"Moon":
 			# Shackleton Crater interior: 0% solar
 			if current_phase == SimPhase.OPERATIONS and selected_landing_site.contains("Interior"):
-				if not spacecraft.has_component("power_rtg") and not spacecraft.has_component("power_dual_rtg"):
-					available_gen_w = 0.0
+				solar_flux = 0.0
+
+	var available_gen_w = rtg_gen_w + (solar_gen_w * solar_flux)
+
+	# 2. Consumption: Profile based on flight phase & duty cycling
+	# Heavy surface sampling drills and surface mobility motors are stowed during transit (Launch/Cruise/Arrival).
+	# During Operations, tools operate on intermittent duty-cycles buffered by the battery storage buffer.
+	var active_con_w = spacecraft.total_power_consumption
+	match current_phase:
+		SimPhase.LAUNCH, SimPhase.CRUISE, SimPhase.ARRIVAL:
+			var surface_draw = 0.0
+			for comp in spacecraft.selected_components:
+				if comp.id.contains("drill") or comp.category == "Landing":
+					surface_draw += comp.power_consumption
+			active_con_w = max(40.0, spacecraft.total_power_consumption - surface_draw)
+		SimPhase.OPERATIONS:
+			var drill_draw = 0.0
+			for comp in spacecraft.selected_components:
+				if comp.id.contains("drill"):
+					drill_draw += comp.power_consumption
+			# Heavy coring drill operates on duty cycle when not in dedicated active sampling
+			active_con_w = max(50.0, spacecraft.total_power_consumption - (drill_draw * 0.70))
 
 	var net_w = available_gen_w - active_con_w
 	instantaneous_power_net_w = net_w

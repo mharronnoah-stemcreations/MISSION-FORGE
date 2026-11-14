@@ -307,13 +307,17 @@ func _update_all() -> void:
 
 	# Power
 	var req_p = mission.power_requirement if mission != null else 250.0
-	bar_power.max_value = max(req_p * 1.5, sc.total_power_generation)
-	bar_power.value = max(0.0, sc.net_power)
-	lbl_power_val.text = "Net: %+.0f W (Gen: %.0fW | Con: %.0fW | Battery: %.0f Wh)" % [
-		sc.net_power, sc.total_power_generation, sc.total_power_consumption, sc.total_battery_capacity_wh
+	bar_power.max_value = max(req_p, sc.total_power_generation)
+	bar_power.value = sc.total_power_generation
+	lbl_power_val.text = "Gen: %.0fW / Req: %.0fW | Con: %.0fW (Net: %+.0fW) | Bat: %.0f Wh" % [
+		sc.total_power_generation, req_p, sc.total_power_consumption, sc.net_power, sc.total_battery_capacity_wh
 	]
-	if sc.net_power < 0.0 and sc.total_battery_capacity_wh <= 0.0:
+	if sc.total_power_generation <= 0.0:
 		lbl_power_val.add_theme_color_override("font_color", UITheme.COLOR_DANGER)
+	elif sc.net_power < 0.0 and sc.total_battery_capacity_wh <= 0.0:
+		lbl_power_val.add_theme_color_override("font_color", UITheme.COLOR_DANGER)
+	elif sc.net_power < 0.0:
+		lbl_power_val.add_theme_color_override("font_color", UITheme.COLOR_WARNING)
 	elif sc.net_power < req_p:
 		lbl_power_val.add_theme_color_override("font_color", UITheme.COLOR_WARNING)
 	else:
