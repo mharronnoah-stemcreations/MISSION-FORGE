@@ -1,4 +1,4 @@
-# MISSIONFORGE 🚀
+# MISSIONFORGE 
 ### 3D Educational Space Mission Design & Systems Engineering Simulator
 
 > **Event:** NASA Space Apps Challenge 2026 — *Space Mission Design Game*  
@@ -9,12 +9,12 @@
 
 ---
 
-## ⚡ Quick Start & How to Play
+## Quick Start & How to Play
 
 ### Option 1: Direct Play (Windows Standalone)
 1. Download or extract `MF ver. 1.0.0 (Windows Build).zip` (available in the root repository or under [Releases](https://github.com/mharronnoah-stemcreations/MISSION-FORGE/releases)).
 2. Extract the archive contents into a folder.
-3. Launch `MISSION_FORGE.exe` to start the game directly. No engine installation required!
+3. Launch `MISSION_FORGE.exe` to start the game directly.
 
 ### Option 2: Running from Source (Godot Developers)
 1. Install **Godot Engine 4.3+ (.NET / C# Edition)** and **.NET 8.0 SDK**.
