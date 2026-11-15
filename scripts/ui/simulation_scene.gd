@@ -960,9 +960,9 @@ func _setup_sky_crane_rig() -> void:
 		c_mesh.height = 1.6
 		canopy.mesh = c_mesh
 		canopy.position = Vector3(0.0, 4.8, 0.0)
-		var c_mat = StandardMaterial3D.new()
-		c_mat.albedo_color = Color(0.95, 0.45, 0.1) # NASA International Orange
-		canopy.material_override = c_mat
+		var canopy_mat = StandardMaterial3D.new()
+		canopy_mat.albedo_color = Color(0.95, 0.45, 0.1) # NASA International Orange
+		canopy.material_override = canopy_mat
 		_jettisoned_chute_rig.add_child(canopy)
 
 		# Suspension cords
