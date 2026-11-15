@@ -23,6 +23,7 @@ var current_structure: StructureType = StructureType.SAT_BUS
 var is_exploded_mode: bool = false
 var explosion_factor: float = 0.0 # 0.0 = compact, 1.0 = exploded
 var highlighted_comp_id: String = ""
+var is_surface_mode: bool = false
 
 var _root_node: Node3D
 var _orbit_cam: Camera3D
@@ -47,6 +48,25 @@ func get_component_node(comp_id: String) -> Node3D:
 
 func get_all_component_nodes() -> Dictionary:
 	return _component_nodes
+
+func set_component_visible(comp_id: String, is_visible: bool) -> void:
+	if _component_nodes.has(comp_id):
+		_component_nodes[comp_id].visible = is_visible
+
+func set_surface_mode(is_surface: bool) -> void:
+	is_surface_mode = is_surface
+	# In surface exploration mode (Mars surface, Lunar surface), atmospheric entry & descent
+	# hardware (aeroshell, heatshield, parachute, sky crane, cruise propulsion/tanks)
+	# has detached and flown away or crashed. The roving vehicle operates completely free.
+	var surface_hidden_comps = [
+		"land_mars_entry",
+		"land_skycrane",
+		"prop_biprop",
+		"prop_aux_tank"
+	]
+	for cid in surface_hidden_comps:
+		if _component_nodes.has(cid):
+			_component_nodes[cid].visible = not is_surface
 
 func _ready() -> void:
 	_cam_pivot = Node3D.new()
@@ -107,6 +127,13 @@ func _process(delta: float) -> void:
 		var e_pos = node.get_meta("exploded_pos", Vector3.ZERO)
 		node.position = c_pos.lerp(e_pos, explosion_factor)
 
+		# Support sub-nodes (e.g. multi-part aeroshell separating in opposite directions)
+		for child in node.get_children():
+			if child is Node3D and child.has_meta("sub_compact_pos"):
+				var sc_pos: Vector3 = child.get_meta("sub_compact_pos")
+				var se_pos: Vector3 = child.get_meta("sub_exploded_pos")
+				child.position = sc_pos.lerp(se_pos, explosion_factor)
+
 	_update_exploded_lines()
 
 func _update_exploded_lines() -> void:
@@ -124,6 +151,13 @@ func _update_exploded_lines() -> void:
 		# Draw line from compact anchor to current position
 		_line_mesh.surface_add_vertex(c_pos)
 		_line_mesh.surface_add_vertex(cur_pos)
+
+		for child in node.get_children():
+			if child is Node3D and child.has_meta("sub_compact_pos"):
+				var sc_pos: Vector3 = cur_pos + (child.get_meta("sub_compact_pos") as Vector3)
+				var scur_pos: Vector3 = cur_pos + child.position
+				_line_mesh.surface_add_vertex(sc_pos)
+				_line_mesh.surface_add_vertex(scur_pos)
 	_line_mesh.surface_end()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -234,6 +268,10 @@ func rebuild_spacecraft(spacecraft: SpacecraftConfig) -> void:
 	for comp in spacecraft.selected_components:
 		if comp.category != "Structure":
 			_build_component_modular(comp)
+
+	# 3. Apply surface mode if active
+	if is_surface_mode:
+		set_surface_mode(true)
 
 func _create_wrapper(comp_id: String, compact_pos: Vector3, exploded_offset: Vector3) -> Node3D:
 	var wrapper = Node3D.new()
@@ -595,122 +633,185 @@ func _build_fixed_solar_panels(comp_id: String) -> void:
 func _build_rtg_generator(comp_id: String) -> void:
 	var compact_pos = Vector3(0.0, 0.15, -0.68)
 	var exploded_offset = Vector3(0.0, 0.2, -1.0)
-	var tilt_x = PI / 2.0
+	var tilt_x = deg_to_rad(-90.0)
 
-	if current_structure == StructureType.ROVER:
-		# On rover: aft tail boom tilted 20 degrees up
-		compact_pos = Vector3(0.0, 0.32, -0.72)
-		exploded_offset = Vector3(0.0, 0.35, -0.9)
-		tilt_x = PI / 2.4
+	var is_rover = (current_structure == StructureType.ROVER)
+	if is_rover:
+		# On Mars/Lunar rover: MMRTG extends from the aft bulkhead, angled upwards and backwards
+		# at ~38 degrees above the horizontal plane, keeping thermal radiation away from the deck.
+		compact_pos = Vector3(0.0, 0.38, -0.64)
+		exploded_offset = Vector3(0.0, 0.35, -1.1)
+		# CylinderMesh starts along local Y.
+		# A negative rotation around X tilts +Y towards -Z (aft/backward) and +Y (upward).
+		# To get ~38° from horizontal: rotation.x = -deg_to_rad(52.0)
+		tilt_x = deg_to_rad(-52.0)
 	elif current_structure == StructureType.DEEP_SPACE:
 		compact_pos = Vector3(0.0, 0.15, -0.76)
 		exploded_offset = Vector3(0.0, 0.25, -1.1)
+		tilt_x = deg_to_rad(-90.0)
 
 	var wrapper = _create_wrapper(comp_id, compact_pos, exploded_offset)
 
-	# Mounting strut connecting to chassis
-	var mount = MeshInstance3D.new()
-	var m_cyl = CylinderMesh.new()
-	m_cyl.top_radius = 0.03
-	m_cyl.bottom_radius = 0.03
-	m_cyl.height = 0.22
-	mount.mesh = m_cyl
-	mount.rotation.x = PI / 2.0
-	mount.position = Vector3(0.0, 0.0, 0.15)
-	var m_mat = StandardMaterial3D.new()
-	m_mat.albedo_color = Color(0.4, 0.42, 0.45)
-	m_mat.metallic = 0.9
-	mount.material_override = m_mat
-	wrapper.add_child(mount)
+	# Mounting bracket connecting to chassis bulkhead
+	var mount_mat = StandardMaterial3D.new()
+	mount_mat.albedo_color = Color(0.42, 0.44, 0.48)
+	mount_mat.metallic = 0.92
+	mount_mat.roughness = 0.3
 
+	if is_rover:
+		# Triangular titanium mounting bracket
+		var bracket = MeshInstance3D.new()
+		var b_box = BoxMesh.new()
+		b_box.size = Vector3(0.24, 0.08, 0.14)
+		bracket.mesh = b_box
+		bracket.position = Vector3(0.0, -0.02, 0.04)
+		bracket.material_override = mount_mat
+		wrapper.add_child(bracket)
+
+		# Twin tubular support struts angled up to the RTG pivot
+		for side in [-1.0, 1.0]:
+			var strut = MeshInstance3D.new()
+			var s_cyl = CylinderMesh.new()
+			s_cyl.top_radius = 0.014
+			s_cyl.bottom_radius = 0.014
+			s_cyl.height = 0.24
+			strut.mesh = s_cyl
+			strut.position = Vector3(side * 0.12, 0.02, 0.02)
+			strut.rotation = Vector3(deg_to_rad(-25.0), 0.0, side * deg_to_rad(18.0))
+			strut.material_override = mount_mat
+			wrapper.add_child(strut)
+
+	# RTG body node containing the cylinder AND all radial cooling fins
+	# Rotating rtg_body rotates cylinder and all fins as a single rigid assembly
+	var rtg_body = Node3D.new()
+	rtg_body.name = "RTGBody"
+	rtg_body.position = Vector3(0.0, 0.08, -0.08) if is_rover else Vector3.ZERO
+	rtg_body.rotation.x = tilt_x
+	wrapper.add_child(rtg_body)
+
+	# Main cylindrical generator housing
 	var rtg = MeshInstance3D.new()
 	var cyl = CylinderMesh.new()
-	cyl.top_radius = 0.14
-	cyl.bottom_radius = 0.14
-	cyl.height = 0.52
+	cyl.top_radius = 0.13
+	cyl.bottom_radius = 0.13
+	cyl.height = 0.50
+	cyl.radial_segments = 24
 	rtg.mesh = cyl
-	rtg.rotation.x = tilt_x
 	var mat = StandardMaterial3D.new()
-	mat.albedo_color = Color(0.22, 0.24, 0.26)
-	mat.roughness = 0.35
-	mat.metallic = 0.85
+	mat.albedo_color = Color(0.24, 0.25, 0.27) # Dark heat-dissipating coating
+	mat.roughness = 0.40
+	mat.metallic = 0.80
 	rtg.material_override = mat
-	wrapper.add_child(rtg)
+	rtg_body.add_child(rtg)
 
-	# Radial heat fins
+	# Top and bottom end caps
+	for cap_y in [-0.25, 0.25]:
+		var cap = MeshInstance3D.new()
+		var c_cyl = CylinderMesh.new()
+		c_cyl.top_radius = 0.135
+		c_cyl.bottom_radius = 0.135
+		c_cyl.height = 0.025
+		cap.mesh = c_cyl
+		cap.position = Vector3(0.0, cap_y, 0.0)
+		cap.material_override = mount_mat
+		rtg_body.add_child(cap)
+
+	# 8 Radial cooling fins (4 crossed plates at 45 degree intervals)
 	var fin_mat = StandardMaterial3D.new()
-	fin_mat.albedo_color = Color(0.18, 0.18, 0.2)
-	fin_mat.metallic = 0.9
-	for i in range(6):
+	fin_mat.albedo_color = Color(0.16, 0.17, 0.19)
+	fin_mat.metallic = 0.90
+	fin_mat.roughness = 0.45
+	for i in range(4):
 		var fin = MeshInstance3D.new()
 		var f_box = BoxMesh.new()
-		f_box.size = Vector3(0.38, 0.012, 0.48)
+		f_box.size = Vector3(0.40, 0.46, 0.012)
 		fin.mesh = f_box
-		fin.rotation.z = float(i) * PI / 3.0
+		fin.rotation.y = float(i) * (PI / 4.0)
 		fin.material_override = fin_mat
-		wrapper.add_child(fin)
+		rtg_body.add_child(fin)
 
 func _build_parabolic_dish(comp_id: String) -> void:
 	var compact_pos = Vector3(0.0, 0.58, 0.1)
 	var exploded_offset = Vector3(0.0, 1.2, 0.3)
 	var pedestal_height = 0.22
+	var dish_radius = 0.36
 
 	if current_structure == StructureType.ROVER:
-		# Gimballed HGA dish on rear-port deck
+		# Gimballed High-Gain Antenna (HGA) dish on rear-port deck
+		# Scaled and placed to fit cleanly inside the open Sky Crane perimeter bay
 		compact_pos = Vector3(-0.25, 0.44, -0.32)
 		exploded_offset = Vector3(-0.35, 1.1, -0.3)
-		pedestal_height = 0.26
+		pedestal_height = 0.18
+		dish_radius = 0.28
 	elif current_structure == StructureType.DEEP_SPACE:
 		compact_pos = Vector3(0.0, 0.65, 0.15)
 		exploded_offset = Vector3(0.0, 1.3, 0.3)
 		pedestal_height = 0.24
+		dish_radius = 0.38
 
 	var wrapper = _create_wrapper(comp_id, compact_pos, exploded_offset)
 
 	# Mounting pedestal connecting to structure
 	var ped = MeshInstance3D.new()
 	var p_cyl = CylinderMesh.new()
-	p_cyl.top_radius = 0.035
-	p_cyl.bottom_radius = 0.05
+	p_cyl.top_radius = 0.032
+	p_cyl.bottom_radius = 0.045
 	p_cyl.height = pedestal_height
 	ped.mesh = p_cyl
 	ped.position = Vector3(0.0, pedestal_height * 0.5, 0.0)
 	var p_mat = StandardMaterial3D.new()
-	p_mat.albedo_color = Color(0.45, 0.48, 0.52)
-	p_mat.metallic = 0.9
+	p_mat.albedo_color = Color(0.48, 0.50, 0.54)
+	p_mat.metallic = 0.92
+	p_mat.roughness = 0.28
 	ped.material_override = p_mat
 	wrapper.add_child(ped)
+
+	# 2-Axis Gimbal Joint
+	var gimbal = MeshInstance3D.new()
+	var g_sph = SphereMesh.new()
+	g_sph.radius = 0.045
+	g_sph.height = 0.09
+	gimbal.mesh = g_sph
+	gimbal.position = Vector3(0.0, pedestal_height, 0.0)
+	gimbal.material_override = p_mat
+	wrapper.add_child(gimbal)
+
+	# Dish assembly node
+	var dish_pivot = Node3D.new()
+	dish_pivot.position = Vector3(0.0, pedestal_height, 0.0)
+	dish_pivot.rotation.x = -PI / 3.2
+	dish_pivot.rotation.y = deg_to_rad(25.0) if current_structure == StructureType.ROVER else 0.0
+	wrapper.add_child(dish_pivot)
 
 	# Reflector dish
 	var dish = MeshInstance3D.new()
 	var sphere = SphereMesh.new()
-	sphere.radius = 0.38
-	sphere.height = 0.16
-	sphere.radial_segments = 36
+	sphere.radius = dish_radius
+	sphere.height = 0.12
+	sphere.radial_segments = 32
 	dish.mesh = sphere
-	dish.position = Vector3(0.0, pedestal_height, 0.0)
-	dish.rotation.x = -PI / 3.0
+	dish.position = Vector3(0.0, 0.04, 0.0)
 	var mat = StandardMaterial3D.new()
-	mat.albedo_color = Color(0.94, 0.95, 0.97)
-	mat.metallic = 0.7
-	mat.roughness = 0.2
+	mat.albedo_color = Color(0.95, 0.96, 0.98) # White composite reflector
+	mat.metallic = 0.65
+	mat.roughness = 0.22
 	dish.material_override = mat
-	wrapper.add_child(dish)
+	dish_pivot.add_child(dish)
 
-	# Feed horn subreflector
+	# Feed horn subreflector tripod
 	var feed = MeshInstance3D.new()
 	var f_cyl = CylinderMesh.new()
-	f_cyl.top_radius = 0.02
-	f_cyl.bottom_radius = 0.035
-	f_cyl.height = 0.12
+	f_cyl.top_radius = 0.016
+	f_cyl.bottom_radius = 0.028
+	f_cyl.height = 0.10
 	feed.mesh = f_cyl
-	feed.position = Vector3(0.0, pedestal_height + 0.15, 0.1)
-	feed.rotation.x = -PI / 3.0
+	feed.position = Vector3(0.0, 0.14, 0.0)
 	var f_mat = StandardMaterial3D.new()
-	f_mat.albedo_color = Color(0.85, 0.75, 0.2) # Gold feed
+	f_mat.albedo_color = Color(0.88, 0.76, 0.22) # Gold feed horn
 	f_mat.metallic = 0.95
+	f_mat.roughness = 0.2
 	feed.material_override = f_mat
-	wrapper.add_child(feed)
+	dish_pivot.add_child(feed)
 
 func _build_horn_antenna(comp_id: String) -> void:
 	var compact_pos = Vector3(0.32, 0.50, 0.32)
@@ -1206,8 +1307,9 @@ func _build_main_engine(comp_id: String) -> void:
 	var exploded_offset = Vector3(0.0, 0.0, -1.5)
 
 	if current_structure == StructureType.ROVER:
-		compact_pos = Vector3(0.0, 0.22, -0.72)
-		exploded_offset = Vector3(0.0, 0.2, -1.3)
+		# Lower rear chassis under belly, clearing the upward-tilted MMRTG
+		compact_pos = Vector3(0.0, 0.06, -0.68)
+		exploded_offset = Vector3(0.0, 0.0, -1.3)
 	elif current_structure == StructureType.DEEP_SPACE:
 		compact_pos = Vector3(0.0, 0.0, -0.72)
 		exploded_offset = Vector3(0.0, 0.0, -1.6)
@@ -1248,8 +1350,9 @@ func _build_ion_engine(comp_id: String) -> void:
 	var exploded_offset = Vector3(0.0, 0.0, -1.5)
 
 	if current_structure == StructureType.ROVER:
-		compact_pos = Vector3(0.0, 0.22, -0.72)
-		exploded_offset = Vector3(0.0, 0.2, -1.3)
+		# Lower rear chassis under belly, clearing the upward-tilted MMRTG
+		compact_pos = Vector3(0.0, 0.06, -0.68)
+		exploded_offset = Vector3(0.0, 0.0, -1.3)
 	elif current_structure == StructureType.DEEP_SPACE:
 		compact_pos = Vector3(0.0, 0.0, -0.72)
 		exploded_offset = Vector3(0.0, 0.0, -1.6)
@@ -1379,80 +1482,284 @@ func _build_lunar_landing_gear(comp_id: String) -> void:
 		wrapper.add_child(foot)
 
 func _build_aeroshell_capsule(comp_id: String) -> void:
-	var compact_pos = Vector3(0.0, -0.3, 0.0)
-	var exploded_offset = Vector3(0.0, -1.6, 0.0)
-	var bot_r = 1.05
-
-	if current_structure == StructureType.ROVER:
-		compact_pos = Vector3(0.0, 0.15, 0.0)
-		bot_r = 1.15
-	elif current_structure == StructureType.DEEP_SPACE:
-		compact_pos = Vector3(0.0, -0.45, 0.0)
-		bot_r = 1.15
+	var compact_pos = Vector3.ZERO
+	var exploded_offset = Vector3.ZERO
 
 	var wrapper = _create_wrapper(comp_id, compact_pos, exploded_offset)
-	var shield = MeshInstance3D.new()
-	var cone = CylinderMesh.new()
-	cone.top_radius = 0.05
-	cone.bottom_radius = bot_r
-	cone.height = 0.45
-	shield.mesh = cone
-	var mat = StandardMaterial3D.new()
-	mat.albedo_color = Color(0.2, 0.22, 0.25) # PICA Heat Shield Dark
-	mat.roughness = 0.88
-	shield.material_override = mat
-	wrapper.add_child(shield)
+
+	# Authentic NASA Mars Entry Aeroshell:
+	# 1. 70-degree blunt spherical PICA Heat Shield Forebody (Bottom)
+	# 2. Conical Beta-Cloth Thermal Blanket Backshell with 4 RCS Steering Pods (Top)
+	# 3. Supersonic Parachute Mortar Canister with Orange/White Banded Cover (Apex)
+
+	# --- 1. PICA HEAT SHIELD FOREBODY (BOTTOM) ---
+	var shield_node = Node3D.new()
+	shield_node.name = "PICAHeatShield"
+	# In compact mode: sits right below the rover wheels at Y = -0.38
+	# In exploded mode: separates downwards to Y = -1.80
+	var shield_c_pos = Vector3(0.0, -0.38, 0.0)
+	var shield_e_pos = Vector3(0.0, -1.80, 0.0)
+	shield_node.position = shield_c_pos
+	shield_node.set_meta("sub_compact_pos", shield_c_pos)
+	shield_node.set_meta("sub_exploded_pos", shield_e_pos)
+	wrapper.add_child(shield_node)
+
+	var heat_shield_mat = StandardMaterial3D.new()
+	heat_shield_mat.albedo_color = Color(0.18, 0.17, 0.16) # Carbon-phenolic PICA tiles
+	heat_shield_mat.roughness = 0.85
+	heat_shield_mat.metallic = 0.25
+
+	# Blunt spherical heat shield cap
+	var hs_dome = MeshInstance3D.new()
+	var dome_mesh = SphereMesh.new()
+	dome_mesh.radius = 1.30
+	dome_mesh.height = 0.42
+	dome_mesh.radial_segments = 40
+	dome_mesh.rings = 16
+	hs_dome.mesh = dome_mesh
+	hs_dome.rotation.x = PI # Inverted spherical dome pointing downward
+	hs_dome.position = Vector3(0.0, 0.06, 0.0)
+	hs_dome.material_override = heat_shield_mat
+	shield_node.add_child(hs_dome)
+
+	# Rounded shoulder / torus interface rim
+	var hs_rim = MeshInstance3D.new()
+	var rim_mesh = TorusMesh.new()
+	rim_mesh.inner_radius = 1.22
+	rim_mesh.outer_radius = 1.32
+	rim_mesh.rings = 32
+	rim_mesh.ring_segments = 16
+	hs_rim.mesh = rim_mesh
+	hs_rim.position = Vector3(0.0, 0.14, 0.0)
+	hs_rim.material_override = heat_shield_mat
+	shield_node.add_child(hs_rim)
+
+	# --- 2. CONICAL BACKSHELL (TOP) ---
+	var backshell_node = Node3D.new()
+	backshell_node.name = "AeroshellBackshell"
+	# In compact mode: sits above the rover deck at Y = 1.10
+	# In exploded mode: separates upwards to Y = +1.80
+	var bs_c_pos = Vector3(0.0, 1.10, 0.0)
+	var bs_e_pos = Vector3(0.0, 1.80, 0.0)
+	backshell_node.position = bs_c_pos
+	backshell_node.set_meta("sub_compact_pos", bs_c_pos)
+	backshell_node.set_meta("sub_exploded_pos", bs_e_pos)
+	wrapper.add_child(backshell_node)
+
+	var backshell_mat = StandardMaterial3D.new()
+	backshell_mat.albedo_color = Color(0.92, 0.93, 0.95) # White Beta-cloth thermal blanket
+	backshell_mat.roughness = 0.40
+	backshell_mat.metallic = 0.15
+
+	# Conical backshell frustum
+	var cone = MeshInstance3D.new()
+	var cone_mesh = CylinderMesh.new()
+	cone_mesh.top_radius = 0.46
+	cone_mesh.bottom_radius = 1.28
+	cone_mesh.height = 0.60
+	cone_mesh.radial_segments = 40
+	cone.mesh = cone_mesh
+	cone.position = Vector3(0.0, 0.30, 0.0)
+	cone.material_override = backshell_mat
+	backshell_node.add_child(cone)
+
+	# 4 RCS Reaction Control System Thruster Pods on the backshell shoulder
+	var rcs_mat = StandardMaterial3D.new()
+	rcs_mat.albedo_color = Color(0.32, 0.34, 0.38)
+	rcs_mat.metallic = 0.92
+	for angle in [0.0, PI * 0.5, PI, PI * 1.5]:
+		var rcs_pod = MeshInstance3D.new()
+		var p_box = BoxMesh.new()
+		p_box.size = Vector3(0.14, 0.08, 0.16)
+		rcs_pod.mesh = p_box
+		var r = 1.05
+		rcs_pod.position = Vector3(cos(angle) * r, 0.12, sin(angle) * r)
+		rcs_pod.rotation.y = -angle
+		rcs_pod.material_override = rcs_mat
+		backshell_node.add_child(rcs_pod)
+
+	# --- 3. SUPERSONIC PARACHUTE MORTAR CANISTER (APEX) ---
+	var chute_mortar = MeshInstance3D.new()
+	var m_cyl = CylinderMesh.new()
+	m_cyl.top_radius = 0.32
+	m_cyl.bottom_radius = 0.34
+	m_cyl.height = 0.22
+	m_cyl.radial_segments = 32
+	chute_mortar.mesh = m_cyl
+	chute_mortar.position = Vector3(0.0, 0.68, 0.0)
+	var mortar_mat = StandardMaterial3D.new()
+	mortar_mat.albedo_color = Color(0.85, 0.86, 0.88)
+	mortar_mat.metallic = 0.85
+	mortar_mat.roughness = 0.30
+	chute_mortar.material_override = mortar_mat
+	backshell_node.add_child(chute_mortar)
+
+	# Iconic NASA Supersonic Parachute Pack Cover with International Orange & White Pattern
+	var pack_cap = MeshInstance3D.new()
+	var cap_cyl = CylinderMesh.new()
+	cap_cyl.top_radius = 0.30
+	cap_cyl.bottom_radius = 0.32
+	cap_cyl.height = 0.06
+	pack_cap.mesh = cap_cyl
+	pack_cap.position = Vector3(0.0, 0.80, 0.0)
+	var orange_mat = StandardMaterial3D.new()
+	orange_mat.albedo_color = Color(0.95, 0.42, 0.08) # NASA International Orange
+	orange_mat.roughness = 0.55
+	orange_mat.metallic = 0.10
+	pack_cap.material_override = orange_mat
+	backshell_node.add_child(pack_cap)
+
+	# Orange/White band marker
+	var band = MeshInstance3D.new()
+	var b_box = BoxMesh.new()
+	b_box.size = Vector3(0.56, 0.065, 0.12)
+	band.mesh = b_box
+	band.position = Vector3(0.0, 0.80, 0.0)
+	var white_mat = StandardMaterial3D.new()
+	white_mat.albedo_color = Color(0.98, 0.98, 1.0)
+	band.material_override = white_mat
+	backshell_node.add_child(band)
 
 func _build_skycrane_stage(comp_id: String) -> void:
 	var compact_pos = Vector3(0.0, 0.75, 0.0)
 	var exploded_offset = Vector3(0.0, 1.5, 0.0)
 
-	if current_structure == StructureType.ROVER:
-		compact_pos = Vector3(0.0, 0.85, 0.0)
-		exploded_offset = Vector3(0.0, 1.6, 0.0)
+	var is_rover = (current_structure == StructureType.ROVER)
+	if is_rover:
+		# Elevate sky crane frame so it hovers cleanly above the deck equipment,
+		# and uses an open perimeter truss frame with a hollow center bay (0.88x0.88m)
+		# so the parabolic dish and mast cameras NEVER clip through the floor!
+		compact_pos = Vector3(0.0, 1.02, 0.0)
+		exploded_offset = Vector3(0.0, 1.8, 0.0)
 
 	var wrapper = _create_wrapper(comp_id, compact_pos, exploded_offset)
-	var crane = MeshInstance3D.new()
-	var box = BoxMesh.new()
-	box.size = Vector3(1.15, 0.16, 1.15)
-	crane.mesh = box
-	var mat = StandardMaterial3D.new()
-	mat.albedo_color = Color(0.72, 0.74, 0.78)
-	mat.metallic = 0.9
-	crane.material_override = mat
-	wrapper.add_child(crane)
 
-	# 4 canted descent thruster nozzles on skycrane frame
-	for c_pos in [Vector3(-0.5, -0.08, 0.5), Vector3(0.5, -0.08, 0.5), Vector3(-0.5, -0.08, -0.5), Vector3(0.5, -0.08, -0.5)]:
-		var noz = MeshInstance3D.new()
-		var n_cone = CylinderMesh.new()
-		n_cone.top_radius = 0.03
-		n_cone.bottom_radius = 0.08
-		n_cone.height = 0.16
-		noz.mesh = n_cone
-		noz.position = c_pos
-		var n_mat = StandardMaterial3D.new()
-		n_mat.albedo_color = Color(0.3, 0.25, 0.2)
-		n_mat.metallic = 0.95
-		noz.material_override = n_mat
-		wrapper.add_child(noz)
+	var frame_mat = StandardMaterial3D.new()
+	frame_mat.albedo_color = Color(0.84, 0.80, 0.70) # Gold MLI aerospace insulation
+	frame_mat.metallic = 0.90
+	frame_mat.roughness = 0.28
 
-	# Descent bridle cables if rover
-	if current_structure == StructureType.ROVER:
+	var titanium_mat = StandardMaterial3D.new()
+	titanium_mat.albedo_color = Color(0.35, 0.38, 0.42)
+	titanium_mat.metallic = 0.95
+	titanium_mat.roughness = 0.25
+
+	if is_rover:
+		# 1. Open Perimeter Frame: 4 outer rectangular truss beams leaving a hollow center bay
+		var beam_w = 0.11
+		var beam_h = 0.08
+		var span = 1.16
+		var half_span = span * 0.5 - beam_w * 0.5
+
+		# Port and Starboard beams
+		for side_x in [-half_span, half_span]:
+			var beam = MeshInstance3D.new()
+			var b_box = BoxMesh.new()
+			b_box.size = Vector3(beam_w, beam_h, span)
+			beam.mesh = b_box
+			beam.position = Vector3(side_x, 0.0, 0.0)
+			beam.material_override = frame_mat
+			wrapper.add_child(beam)
+
+		# Fore and Aft beams (spanning between side beams)
+		var inner_len = span - beam_w * 2.0
+		for side_z in [-half_span, half_span]:
+			var beam = MeshInstance3D.new()
+			var b_box = BoxMesh.new()
+			b_box.size = Vector3(inner_len, beam_h, beam_w)
+			beam.mesh = b_box
+			beam.position = Vector3(0.0, 0.0, side_z)
+			beam.material_override = frame_mat
+			wrapper.add_child(beam)
+
+		# 2. Elevated Top Transverse Arches & Gold Hydrazine Descent Propellant Tank
+		for side_z in [-0.22, 0.22]:
+			var arch = MeshInstance3D.new()
+			var a_cyl = CylinderMesh.new()
+			a_cyl.top_radius = 0.02
+			a_cyl.bottom_radius = 0.02
+			a_cyl.height = span * 0.92
+			arch.mesh = a_cyl
+			arch.rotation.z = PI / 2.0
+			arch.position = Vector3(0.0, 0.10, side_z)
+			arch.material_override = titanium_mat
+			wrapper.add_child(arch)
+
+		# Central Gold Propellant Tank Sphere
+		var tank = MeshInstance3D.new()
+		var t_sph = SphereMesh.new()
+		t_sph.radius = 0.28
+		t_sph.height = 0.44
+		tank.mesh = t_sph
+		tank.position = Vector3(0.0, 0.14, 0.0)
+		var tank_mat = StandardMaterial3D.new()
+		tank_mat.albedo_color = Color(0.92, 0.78, 0.22) # Gold MLI blanket
+		tank_mat.metallic = 0.95
+		tank_mat.roughness = 0.18
+		tank.material_override = tank_mat
+		wrapper.add_child(tank)
+
+		# 3. 4 Corner Outrigger Pods with Mars Landing Engine (MLE) Canted Nozzle Pairs
+		var nozzle_mat = StandardMaterial3D.new()
+		nozzle_mat.albedo_color = Color(0.28, 0.22, 0.18) # Niobium thruster nozzle
+		nozzle_mat.metallic = 0.95
+		nozzle_mat.roughness = 0.35
+
+		var outrigger_offsets = [
+			Vector3(-0.58, 0.0, -0.58),
+			Vector3(0.58, 0.0, -0.58),
+			Vector3(-0.58, 0.0, 0.58),
+			Vector3(0.58, 0.0, 0.58)
+		]
+
+		for corner in outrigger_offsets:
+			var pod = MeshInstance3D.new()
+			var p_box = BoxMesh.new()
+			p_box.size = Vector3(0.18, 0.12, 0.18)
+			pod.mesh = p_box
+			pod.position = corner
+			pod.material_override = titanium_mat
+			wrapper.add_child(pod)
+
+			# Pair of canted rocket nozzles at each corner (8 MLE thrusters total)
+			for n_idx in [-0.045, 0.045]:
+				var noz = MeshInstance3D.new()
+				var n_cone = CylinderMesh.new()
+				n_cone.top_radius = 0.02
+				n_cone.bottom_radius = 0.055
+				n_cone.height = 0.12
+				noz.mesh = n_cone
+				var cant_x = sign(corner.x) * deg_to_rad(20.0)
+				var cant_z = sign(corner.z) * deg_to_rad(20.0)
+				noz.rotation = Vector3(cant_z, 0.0, cant_x)
+				noz.position = corner + Vector3(n_idx, -0.09, n_idx)
+				noz.material_override = nozzle_mat
+				wrapper.add_child(noz)
+
+		# 4. Descent Bridle Cords connecting Sky Crane down to Rover Chassis
 		var cable_mat = StandardMaterial3D.new()
-		cable_mat.albedo_color = Color(0.85, 0.85, 0.85)
-		cable_mat.metallic = 0.95
-		for side_x in [-0.38, 0.38]:
+		cable_mat.albedo_color = Color(0.90, 0.90, 0.92)
+		cable_mat.metallic = 0.90
+		for side_x in [-0.42, 0.42]:
 			for side_z in [-0.42, 0.42]:
 				var cable = MeshInstance3D.new()
 				var c_cyl = CylinderMesh.new()
-				c_cyl.top_radius = 0.008
-				c_cyl.bottom_radius = 0.008
-				c_cyl.height = 0.40
+				c_cyl.top_radius = 0.007
+				c_cyl.bottom_radius = 0.007
+				c_cyl.height = 0.55
 				cable.mesh = c_cyl
-				cable.position = Vector3(side_x, -0.22, side_z)
+				cable.position = Vector3(side_x, -0.28, side_z)
 				cable.material_override = cable_mat
 				wrapper.add_child(cable)
+
+	else:
+		# Standard descent stage for non-rover craft
+		var crane = MeshInstance3D.new()
+		var box = BoxMesh.new()
+		box.size = Vector3(1.15, 0.16, 1.15)
+		crane.mesh = box
+		crane.material_override = frame_mat
+		wrapper.add_child(crane)
 
 func _build_battery_pack(comp_id: String) -> void:
 	var compact_pos = Vector3(-0.46, -0.15, -0.2)

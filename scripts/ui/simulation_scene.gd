@@ -115,6 +115,7 @@ var _sky_crane_plumes: Array[MeshInstance3D] = []
 var _bridle_cables_mesh: ImmediateMesh
 var _bridle_mesh_inst: MeshInstance3D
 var _landing_dust_cloud: MeshInstance3D
+var _jettisoned_chute_rig: Node3D
 
 # Surface Sampling Cutscene State
 var _is_sampling_cutscene: bool = false
@@ -300,6 +301,8 @@ func _init_simulation() -> void:
 
 	# Initial position and scale on authentic NASA orbital trajectory ring
 	var dest = mission.destination if mission != null else "Earth"
+	if _craft_preview_builder != null and (dest == "Mars" or dest == "Moon") and sim_engine.current_phase >= 2:
+		_craft_preview_builder.set_surface_mode(true)
 	var init_alt_ratio = 705.0 / 6371.0
 	if dest == "Moon":
 		init_alt_ratio = 100.0 / 1737.4
@@ -632,6 +635,11 @@ func _on_phase_changed(phase_idx: int, phase_name: String) -> void:
 	var dest = gm.current_mission.destination if gm != null and gm.current_mission != null else "Mars"
 	var is_surface_mission = (dest == "Mars" or dest == "Moon")
 
+	# Entry, Descent & Landing / Surface phases: cleanly detach EDL hardware (aeroshell, parachute, skycrane)
+	if is_surface_mission and phase_idx >= 2:
+		if _craft_preview_builder != null:
+			_craft_preview_builder.set_surface_mode(true)
+
 	# SimPhase.ARRIVAL (Phase 2): Entry, Descent & Landing onto planetary surface
 	if phase_idx == 2 and is_surface_mission:
 		if _surface_env != null:
@@ -926,6 +934,52 @@ func _setup_sky_crane_rig() -> void:
 	_landing_dust_cloud.visible = false
 	craft_pivot.add_child(_landing_dust_cloud)
 
+	# 5. Jettisoned Aeroshell Backshell & Supersonic Parachute Rig (Mars EDL)
+	if _jettisoned_chute_rig == null:
+		_jettisoned_chute_rig = Node3D.new()
+		_jettisoned_chute_rig.name = "JettisonedChuteRig"
+		_jettisoned_chute_rig.visible = false
+		craft_pivot.add_child(_jettisoned_chute_rig)
+
+		# Backshell truncated cone
+		var bs = MeshInstance3D.new()
+		var bs_cone = CylinderMesh.new()
+		bs_cone.top_radius = 0.35
+		bs_cone.bottom_radius = 1.25
+		bs_cone.height = 0.65
+		bs.mesh = bs_cone
+		var bs_mat = StandardMaterial3D.new()
+		bs_mat.albedo_color = Color(0.92, 0.93, 0.95)
+		bs.material_override = bs_mat
+		_jettisoned_chute_rig.add_child(bs)
+
+		# Supersonic parachute canopy dome
+		var canopy = MeshInstance3D.new()
+		var c_mesh = SphereMesh.new()
+		c_mesh.radius = 2.2
+		c_mesh.height = 1.6
+		canopy.mesh = c_mesh
+		canopy.position = Vector3(0.0, 4.8, 0.0)
+		var c_mat = StandardMaterial3D.new()
+		c_mat.albedo_color = Color(0.95, 0.45, 0.1) # NASA International Orange
+		canopy.material_override = c_mat
+		_jettisoned_chute_rig.add_child(canopy)
+
+		# Suspension cords
+		var lines = MeshInstance3D.new()
+		var imm = ImmediateMesh.new()
+		lines.mesh = imm
+		imm.surface_begin(Mesh.PRIMITIVE_LINES)
+		for a in [0.0, PI * 0.5, PI, PI * 1.5]:
+			imm.surface_add_vertex(Vector3(cos(a) * 0.35, 0.32, sin(a) * 0.35))
+			imm.surface_add_vertex(Vector3(cos(a) * 2.0, 4.5, sin(a) * 2.0))
+		imm.surface_end()
+		var l_mat = StandardMaterial3D.new()
+		l_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		l_mat.albedo_color = Color(0.9, 0.9, 0.9)
+		lines.material_override = l_mat
+		_jettisoned_chute_rig.add_child(lines)
+
 func _start_landing_cutscene() -> void:
 	if _is_landing_cutscene or _is_sampling_cutscene:
 		return
@@ -934,6 +988,11 @@ func _start_landing_cutscene() -> void:
 	craft_pivot.rotation = Vector3.ZERO
 	craft_node.scale = Vector3(1.0, 1.0, 1.0)
 	craft_node.rotation = Vector3.ZERO
+
+	# Ensure rover is in surface mode so duplicate descent hardware on the rover chassis is detached
+	if _craft_preview_builder != null:
+		_craft_preview_builder.set_surface_mode(true)
+
 	_prev_cam_mode_before_cutscene = _current_cam_mode
 	_is_landing_cutscene = true
 	_landing_elapsed = 0.0
@@ -949,6 +1008,10 @@ func _start_landing_cutscene() -> void:
 			_sky_crane_rig.visible = true
 			_sky_crane_rig.position = Vector3(0.0, 7.8, 0.0)
 			_sky_crane_rig.rotation = Vector3.ZERO
+		if _jettisoned_chute_rig != null:
+			_jettisoned_chute_rig.visible = true
+			_jettisoned_chute_rig.position = Vector3(6.5, 13.5, -9.5)
+			_jettisoned_chute_rig.rotation.z = deg_to_rad(-16.0)
 		craft_node.position.y = 5.6
 		lbl_cutscene_title.text = "AUTONOMOUS MARS EDL // SKY CRANE DESCENT"
 		lbl_cutscene_target.text = "TARGET: JEZERO CRATER DELTA FAN // TERRAIN RELATIVE NAVIGATION (TRN)"
@@ -1005,6 +1068,12 @@ func _update_landing_cutscene(delta: float) -> void:
 			_sky_crane_rig.position = Vector3(0.0, sc_y, 0.0)
 			craft_node.position.y = rover_y
 
+			# Jettisoned supersonic parachute & backshell drifts away into the Martian sky!
+			if _jettisoned_chute_rig != null:
+				_jettisoned_chute_rig.visible = true
+				_jettisoned_chute_rig.position = Vector3(6.5 + st1_t * 10.0, 13.5 + st1_t * 6.0, -9.5 - st1_t * 16.0)
+				_jettisoned_chute_rig.rotation.z = deg_to_rad(-16.0) - st1_t * 0.20
+
 			# Thruster plumes flicker
 			for p in _sky_crane_plumes:
 				var f = randf_range(0.85, 1.3)
@@ -1028,8 +1097,8 @@ func _update_landing_cutscene(delta: float) -> void:
 			_landing_dust_cloud.scale = Vector3.ONE * (st1_t * 1.4)
 
 		bar_coring.value = st1_t * 35.0
-		lbl_coring_status.text = "Descent Rate: -1.8 m/s | Altitude: %.1f m | TRN Terrain Lock: 100%%" % [lerpf(18.0, 4.2, st1_t)]
-		reticle_target.text = "[ + ] TACTICAL EDL // SKY CRANE TERMINAL DESCENT\nALTITUDE: %.1f M // VELOCITY: -1.8 M/S\nTERRAIN LOCK: JEZERO DELTA FAN" % [lerpf(18.0, 4.2, st1_t)]
+		lbl_coring_status.text = "Aeroshell & Supersonic Chute Jettisoned | Sky Crane Retro-Braking: -1.8 m/s | TRN Terrain Lock: 100%"
+		reticle_target.text = "[ + ] TACTICAL EDL // SKY CRANE TERMINAL RETRO-DESCENT\nAEROSHELL & SUPERSONIC CHUTE: JETTISONED\nALTITUDE: %.1f M // VELOCITY: -1.8 M/S\nTERRAIN LOCK: JEZERO DELTA FAN" % [lerpf(18.0, 4.2, st1_t)]
 
 	elif t < 5.4:
 		# ======================================================================
@@ -1044,6 +1113,9 @@ func _update_landing_cutscene(delta: float) -> void:
 		var cam_pos = Vector3(-2.6, 0.9, 3.4)
 		cam_3d.position = cam_pos
 		cam_3d.look_at(Vector3(0.0, 0.5, 0.0), Vector3.UP)
+
+		if _jettisoned_chute_rig != null:
+			_jettisoned_chute_rig.visible = false
 
 		if is_mars and _sky_crane_rig != null:
 			_sky_crane_rig.position = Vector3(0.0, 3.4, 0.0)
@@ -1127,8 +1199,14 @@ func _end_landing_cutscene() -> void:
 	craft_pivot.position = Vector3.ZERO
 	craft_pivot.rotation = Vector3.ZERO
 
+	# Ensure surface mode is active on rover (all descent hardware cleanly detached)
+	if _craft_preview_builder != null:
+		_craft_preview_builder.set_surface_mode(true)
+
 	if _sky_crane_rig != null:
 		_sky_crane_rig.visible = false
+	if _jettisoned_chute_rig != null:
+		_jettisoned_chute_rig.visible = false
 	if _landing_dust_cloud != null:
 		_landing_dust_cloud.visible = false
 	if _bridle_cables_mesh != null:
@@ -1209,6 +1287,9 @@ func _start_sampling_cutscene() -> void:
 	craft_pivot.rotation = Vector3.ZERO
 	craft_node.scale = Vector3(1.0, 1.0, 1.0)
 	craft_node.rotation = Vector3.ZERO
+
+	if _craft_preview_builder != null:
+		_craft_preview_builder.set_surface_mode(true)
 
 	_setup_sampling_rig()
 	if _sampling_rig != null:
@@ -1448,6 +1529,9 @@ func _end_sampling_cutscene() -> void:
 	cutscene_sampling.visible = false
 	if _sampling_rig != null:
 		_sampling_rig.visible = false
+
+	if _craft_preview_builder != null:
+		_craft_preview_builder.set_surface_mode(true)
 
 	# Reset arm & mast position
 	if _craft_preview_builder != null:
